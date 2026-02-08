@@ -40,39 +40,31 @@ jobs:
           npx cap add ios
           npx cap sync ios
 
-      - name: Locate Podfile & Install
+      - name: Build IPA (Auto Detect)
         working-directory: ./frontend
         run: |
-          # Podfile'ı bul ve olduğu klasöre girip install yap
-          POD_DIR=$(find . -name Podfile -exec dirname {} \; | head -n 1)
-          if [ -z "$POD_DIR" ]; then
-            echo "Podfile BULUNAMADI! ios klasörü içeriği:"
-            ls -R ios
-            exit 1
+          # Klasorleri kontrol et
+          PROJECT_PATH=$(find . -name "App.xcodeproj" | head -n 1)
+          PROJECT_DIR=$(dirname "$PROJECT_PATH")
+          
+          # Podfile var mi?
+          if [ -f "$PROJECT_DIR/Podfile" ]; then
+            echo "Podfile bulundu. Pods yukleniyor..."
+            cd "$PROJECT_DIR"
+            pod install
+            BUILD_TYPE="-workspace"
+            BUILD_NAME="App.xcworkspace"
+          else
+            echo "Podfile YOK. Dogrudan xcodeproj derlenecek."
+            cd "$PROJECT_DIR"
+            BUILD_TYPE="-project"
+            BUILD_NAME="App.xcodeproj"
           fi
           
-          echo "Podfile bulundu: $POD_DIR"
-          cd "$POD_DIR"
-          pod install
-
-      - name: Build IPA (Unsigned)
-        working-directory: ./frontend
-        run: |
-          # Workspace dosyasini bul (.xcworkspace)
-          WORKSPACE=$(find . -name "*.xcworkspace" | head -n 1)
-          if [ -z "$WORKSPACE" ]; then
-            echo "Workspace .xcworkspace BULUNAMADI! build iptal."
-            exit 1
-          fi
+          echo "Derleme Basliyor: $BUILD_NAME ($BUILD_TYPE)"
           
-          echo "Workspace bulundu: $WORKSPACE"
-          # Workspace adini al (App.xcworkspace gibi)
-          WORKSPACE_NAME=$(basename "$WORKSPACE")
-          # Klasorune git
-          cd "$(dirname "$WORKSPACE")"
-          
-          # Clean & Archive
-          xcodebuild -workspace "$WORKSPACE_NAME" \
+          # xcodebuild Komutu
+          xcodebuild "$BUILD_TYPE" "$BUILD_NAME" \
             -scheme App \
             -destination 'generic/platform=iOS' \
             clean archive \
