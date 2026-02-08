@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from './project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { SheetsService } from '../sheets/sheets.service';
 
 @Injectable()
 export class ProjectsService {
     constructor(
         @InjectRepository(Project)
         private projectsRepository: Repository<Project>,
+        private readonly sheetsService: SheetsService,
     ) { }
 
     findAll(): Promise<Project[]> {
@@ -21,7 +23,17 @@ export class ProjectsService {
 
     async create(createProjectDto: CreateProjectDto): Promise<Project> {
         const project = this.projectsRepository.create(createProjectDto);
-        return this.projectsRepository.save(project);
+        const savedProject = await this.projectsRepository.save(project);
+
+        // Google Sheets Entegrasyonu (Yeni Sekme Oluştur)
+        const sheetId = process.env.GOOGLE_SHEET_ID;
+        if (sheetId) {
+            // Proje adını veya kodunu sekme adı olarak kullan
+            // Türkçe karakter sorununu önlemek için Code kullanmak daha güvenli olabilir ama kullanıcı adı görmek ister.
+            await this.sheetsService.addSheet(sheetId, savedProject.name);
+        }
+
+        return savedProject;
     }
 
     async findNearest(lat: number, lng: number): Promise<Project | null> {
