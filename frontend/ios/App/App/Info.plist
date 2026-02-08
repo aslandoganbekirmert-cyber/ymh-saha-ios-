@@ -51,6 +51,8 @@
     <string>YMH Saha, fişleri taramak ve analiz etmek için kameranızı kullanır.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>YMH Saha, fiş fotoğraflarını yüklemek için galerinize erişir.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>YMH Saha, konumunuza en yakın projeyi otomatik seçmek için konum bilgisini kullanır.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>YMH Saha, çekilen fiş fotoğraflarını galerinize kaydeder.</string>
 </dict>
