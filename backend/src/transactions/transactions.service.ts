@@ -1,4 +1,3 @@
-
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -6,7 +5,7 @@ import { MaterialTransaction } from './transaction.entity';
 import { SheetsService } from '../sheets/sheets.service';
 import { OCRService } from '../ocr/ocr.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-// IStorageService should be normal import in Nest, but if needed as type:
+import { ProjectsService } from '../projects/projects.service';
 import { STORAGE_SERVICE } from '../storage/storage.interface';
 import type { IStorageService } from '../storage/storage.interface';
 
@@ -17,6 +16,7 @@ export class TransactionsService {
         private repo: Repository<MaterialTransaction>,
         private sheetsService: SheetsService,
         private ocrService: OCRService,
+        private projectsService: ProjectsService,
         @Inject(STORAGE_SERVICE)
         private storageService: IStorageService,
     ) { }
@@ -104,46 +104,68 @@ export class TransactionsService {
             quantity: typeof body.quantity === 'string' ? parseFloat(body.quantity) : body.quantity,
         });
 
-        const saved = await this.repo.save(tx) as any;
+        const saved = await this.repo.save(tx);
 
         // Sync to Google Sheets
         let syncStatus = false;
         let syncErr: string | null = null;
 
         if (saved && saved.project_id) {
-            const dateVal = saved.created_at ? saved.created_at.toISOString() : new Date().toISOString();
-            const row = [
-                saved.project_id,
-                dateVal,
-                saved.plate_number,
-                saved.material_type,
-                saved.quantity,
-                saved.unit,
-                saved.supplier_name || '',
-                saved.ticket_number || '',
-                photoUrl // Direct link to photo in Drive/GCS
-            ];
+            const spreadsheetId = process.env.GOOGLE_SHEET_ID;
 
-            const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
             if (spreadsheetId) {
                 try {
-                    await this.sheetsService.appendRow(spreadsheetId, row);
+                    // Proje Adını Bul (Sekme Adı Olarak Kullanılacak)
+                    const project = await this.projectsService.findOne(saved.project_id);
+                    const sheetTitle = project ? project.name : 'Unknown';
+
+                    // Tarih ve Saat Ayrıştırma
+                    const txDate = saved.transaction_date || saved.created_at || new Date();
+                    const dateVal = txDate instanceof Date ? txDate : new Date(txDate);
+
+                    const datePart = dateVal.toISOString().split('T')[0];
+                    const timePart = dateVal.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+                    const row = [
+                        datePart,           // Tarih
+                        timePart,           // Saat
+                        sheetTitle,         // Proje
+                        saved.plate_number, // Plaka
+                        saved.material_type,// Malzeme
+                        saved.quantity,     // Miktar
+                        saved.unit,         // Birim
+                        saved.supplier_name || '', // Tedarikçi
+                        saved.ticket_number || '', // Fiş No
+                        saved.notes || photoUrl // Notlar (Varsa URL)
+                    ];
+
+                    await this.sheetsService.appendRow(spreadsheetId, sheetTitle, row);
                     syncStatus = true;
+                    console.log(`Synced to Sheet: ${sheetTitle}`);
                 } catch (e) {
-                    syncErr = e.message;
-                    console.error('Sheets Sync Error:', e);
+                    const syncErrMessage = (e instanceof Error) ? e.message : 'Unknown Sheet Error';
+                    console.error('Google Sheets Sync Failed:', syncErrMessage);
+                    saved.is_synced_sheets = false; // Explicitly set to false on failure
+                    saved.sync_error = syncErrMessage;
+                    await this.repo.save(saved); // Save immediately on failure
+                    return saved; // Return early after saving sync error
                 }
             } else {
-                syncErr = 'GOOGLE_SHEETS_ID not configured';
+                syncErr = 'GOOGLE_SHEET_ID not configured';
             }
         }
 
-        // Update sync status in DB
-        if (saved) {
-            saved.is_synced_sheets = syncStatus;
+        // Update sync status in DB if not already saved due to an error
+        if (saved && syncErr !== null) { // This block handles the case where GOOGLE_SHEET_ID is not configured
+            saved.is_synced_sheets = syncStatus; // Will be false
             saved.sync_error = syncErr;
             await this.repo.save(saved);
+        } else if (saved && syncStatus === true) { // This block handles successful sync
+            saved.is_synced_sheets = syncStatus;
+            saved.sync_error = ""; // Clear any previous error if successful
+            await this.repo.save(saved);
         }
+
 
         return saved;
     }
