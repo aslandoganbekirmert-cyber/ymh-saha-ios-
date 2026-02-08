@@ -17,15 +17,14 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js v22
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Install Dependencies
         working-directory: ./frontend
         run: |
-          # npm ci yerine npm install kullaniyoruz (package-lock.json eksikse hata vermesin)
           npm install --legacy-peer-deps
           npm install @capacitor/core @capacitor/cli @capacitor/ios
 
@@ -37,7 +36,7 @@ jobs:
       - name: Add iOS Platform & Sync
         working-directory: ./frontend
         run: |
-          npx cap add ios
+          npx cap add ios || true 
           npx cap sync ios
 
       - name: Build IPA (Unsigned)
