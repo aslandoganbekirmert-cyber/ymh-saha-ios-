@@ -31,7 +31,7 @@ jobs:
       - name: Build Web App
         working-directory: ./frontend
         run: |
-          # PWA Plugin hatasını önlemek için build öncesi config düzenlemesi
+          # PWA Plugin hatasini onlemek icin build oncesi config duzenlemesi
           # sed -i '' "s/enabled: false/enabled: true/g" vite.config.ts || true
           npm run build
 
