@@ -40,26 +40,49 @@ jobs:
           npx cap add ios
           npx cap sync ios
 
-      - name: Install Cocoapods
-        working-directory: ./frontend/ios/App
+      - name: Locate Podfile & Install
+        working-directory: ./frontend
         run: |
+          # Podfile'ı bul ve olduğu klasöre girip install yap
+          POD_DIR=$(find . -name Podfile -exec dirname {} \; | head -n 1)
+          if [ -z "$POD_DIR" ]; then
+            echo "Podfile BULUNAMADI! ios klasörü içeriği:"
+            ls -R ios
+            exit 1
+          fi
+          
+          echo "Podfile bulundu: $POD_DIR"
+          cd "$POD_DIR"
           pod install
 
       - name: Build IPA (Unsigned)
-        working-directory: ./frontend/ios/App
+        working-directory: ./frontend
         run: |
+          # Workspace dosyasini bul (.xcworkspace)
+          WORKSPACE=$(find . -name "*.xcworkspace" | head -n 1)
+          if [ -z "$WORKSPACE" ]; then
+            echo "Workspace .xcworkspace BULUNAMADI! build iptal."
+            exit 1
+          fi
+          
+          echo "Workspace bulundu: $WORKSPACE"
+          # Workspace adini al (App.xcworkspace gibi)
+          WORKSPACE_NAME=$(basename "$WORKSPACE")
+          # Klasorune git
+          cd "$(dirname "$WORKSPACE")"
+          
           # Clean & Archive
-          xcodebuild -workspace App.xcworkspace \
+          xcodebuild -workspace "$WORKSPACE_NAME" \
             -scheme App \
             -destination 'generic/platform=iOS' \
             clean archive \
-            -archivePath ../build/App.xcarchive \
+            -archivePath ../../../build/App.xcarchive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Package Payload (IPA)
-        working-directory: ./frontend/ios
+        working-directory: ./frontend
         run: |
           mkdir -p build/Payload
           cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
@@ -70,4 +93,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ymh-saha-ios-unsigned
-          path: frontend/ios/build/App.ipa
+          path: frontend/build/App.ipa
