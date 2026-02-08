@@ -1,0 +1,36 @@
+# Bağımlılıklar (Asla Yükleme)
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+mobile/node_modules/
+package-lock.json
+
+# Build Çıktıları
+dist/
+build/
+backend/dist/
+frontend/dist/
+frontend/ios/App/App/build/
+frontend/android/app/build/
+
+# Gizli Dosyalar (Güvenlik)
+.env
+.env.*
+*.json (sadece önemli olanları yükle)
+vision-credentials.json
+google-credentials.json
+vision-usage.json
+credentials.json
+key-*.json
+
+# Sistem Dosyaları
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.gemini/
+.agent/
+
+# Capacitor
+frontend/ios/App/Pods/
+frontend/android/.gradle/

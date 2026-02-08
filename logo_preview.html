@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YMH Saha - Logo Concept</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        .logo-card {
+            background: white;
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .dark-mode {
+            background: #1a1a1a;
+            color: white;
+        }
+        h2 { margin-top: 30px; color: #666; font-weight: 300; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- LIGHT MODE PREVIEW -->
+    <div class="logo-card">
+        <svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <style>
+                    .base { fill: #111; }
+                    .accent { fill: #FF4500; } /* Safety Orange - Sert */
+                    .bolt { fill: #111; }
+                </style>
+            </defs>
+
+            <!-- Y: Pylon Tower (Sert, Geometrik) -->
+            <path class="base" d="M40,150 L70,80 L80,80 L50,150 Z" /> <!-- Sol Ayak -->
+            <path class="base" d="M110,150 L80,80 L70,80 L100,150 Z" /> <!-- Sağ Ayak -->
+            <rect x="65" y="40" width="20" height="110" class="base" /> <!-- Ana Direk -->
+            <rect x="40" y="60" width="70" height="10" class="base" /> <!-- Üst Kol -->
+            <!-- İzolatörler -->
+            <circle cx="45" cy="70" r="4" class="accent" />
+            <circle cx="105" cy="70" r="4" class="accent" />
+
+            <!-- M: Electric Pulse (Keskin Zikzak) -->
+             <path class="accent" d="M130,150 L150,90 L170,140 L190,50 L210,150 L220,150 L200,30 L170,120 L150,70 L120,150 Z" stroke="none" />
+
+            <!-- H: Street Light (Köşeli) -->
+            <path class="base" d="M250,40 L270,40 L270,150 L250,150 Z" /> <!-- Sol Direk -->
+            <path class="base" d="M270,100 L310,100 L310,80 L270,80 Z" /> <!-- Bağlantı -->
+            <path class="base" d="M310,40 L330,40 L330,150 L310,150 Z" /> <!-- Sağ Direk (Lamba) -->
+            <!-- Lamba Kafası -->
+            <path class="base" d="M330,40 L380,40 L380,60 L330,60 Z" /> 
+            <!-- Işık Hüzmesi (Sert Üçgen) -->
+            <path class="accent" d="M340,60 L380,150 L320,150 Z" opacity="0.4" />
+
+            <!-- TEXT -->
+            <text x="200" y="190" font-family="Arial Black, sans-serif" font-weight="900" font-size="24" text-anchor="middle" fill="#111" letter-spacing="8">YMH</text>
+        </svg>
+        <h2>Light Mode</h2>
+    </div>
+
+    <!-- DARK MODE PREVIEW -->
+    <div class="logo-card dark-mode">
+         <svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <style>
+                    .base-d { fill: #fff; }
+                    .accent-d { fill: #FF5722; }
+                </style>
+            </defs>
+
+            <!-- Y -->
+            <path class="base-d" d="M40,150 L70,80 L80,80 L50,150 Z" /> 
+            <path class="base-d" d="M110,150 L80,80 L70,80 L100,150 Z" /> 
+            <rect x="65" y="40" width="20" height="110" class="base-d" /> 
+            <rect x="40" y="60" width="70" height="10" class="base-d" /> 
+            <circle cx="45" cy="70" r="4" class="accent-d" />
+            <circle cx="105" cy="70" r="4" class="accent-d" />
+
+            <!-- M -->
+             <path class="accent-d" d="M130,150 L150,90 L170,140 L190,50 L210,150 L220,150 L200,30 L170,120 L150,70 L120,150 Z" stroke="none" />
+
+            <!-- H -->
+            <path class="base-d" d="M250,40 L270,40 L270,150 L250,150 Z" /> 
+            <path class="base-d" d="M270,100 L310,100 L310,80 L270,80 Z" /> 
+            <path class="base-d" d="M310,40 L330,40 L330,150 L310,150 Z" /> 
+            <path class="base-d" d="M330,40 L380,40 L380,60 L330,60 Z" /> 
+            <path class="accent-d" d="M340,60 L380,150 L320,150 Z" opacity="0.4" />
+
+            <text x="200" y="190" font-family="Arial Black, sans-serif" font-weight="900" font-size="24" text-anchor="middle" fill="#fff" letter-spacing="8">YMH</text>
+        </svg>
+        <h2>Dark Mode</h2>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<svg width="512" height="512" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <style>
+            .base { fill: #FFD600; strok:none; } /* Güvenlik Sarısı */
+            .accent { fill: #FFFFFF; stroke:none; } /* Beyaz Detaylar */
+            .bg { fill: #121212; } /* Siyah Arkaplan */
+        </style>
+    </defs>
+    
+    <!-- Arkaplan (App Icon için Kare) -->
+    <rect width="400" height="200" fill="#121212" rx="20" />
+
+    <!-- Y: Pylon Tower (Sol Ayak, Sağ Ayak, Direk) -->
+    <path class="base" d="M40,150 L70,80 L80,80 L50,150 Z" /> 
+    <path class="base" d="M110,150 L80,80 L70,80 L100,150 Z" /> 
+    <rect x="65" y="40" width="20" height="110" class="base" /> 
+    <rect x="40" y="60" width="70" height="10" class="base" /> 
+    <!-- İzolatörler (Beyaz) -->
+    <circle cx="45" cy="70" r="4" class="accent" />
+    <circle cx="105" cy="70" r="4" class="accent" />
+
+    <!-- M: Electric Pulse (Keskin Zikzak - Beyaz Konturlu Sarı) -->
+     <path class="base" d="M130,150 L150,90 L170,140 L190,50 L210,150 L220,150 L200,30 L170,120 L150,70 L120,150 Z" />
+
+    <!-- H: Street Light (Sağ bacak lamba direği) -->
+    <path class="base" d="M250,40 L270,40 L270,150 L250,150 Z" /> <!-- Sol -->
+    <path class="base" d="M270,100 L310,100 L310,80 L270,80 Z" />  <!-- Orta -->
+    <path class="base" d="M310,40 L330,40 L330,150 L310,150 Z" />  <!-- Sağ Direk -->
+    
+    <!-- Lamba Kafası -->
+    <path class="accent" d="M330,40 L380,40 L380,60 L330,60 Z" /> 
+    <!-- Işık Hüzmesi (Opak Sarı) -->
+    <path fill="#FFD600" d="M340,60 L380,150 L320,150 Z" opacity="0.3" />
+
+    <!-- Alt Yazı -->
+    <text x="200" y="190" font-family="Arial, sans-serif" font-weight="bold" font-size="16" text-anchor="middle" fill="#666" letter-spacing="4">SAHA'M</text>
+</svg>

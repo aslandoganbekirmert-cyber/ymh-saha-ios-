@@ -1,0 +1,149 @@
+/* SAHA'M Premium Industrial Theme */
+:root {
+  --bg-primary: #121212;
+  --bg-secondary: #1E1E1E;
+  --bg-card: #252525;
+  
+  --accent-yellow: #FFD600; /* Safety Yellow */
+  --accent-orange: #FF9100;
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #AAAAAA;
+  --text-muted: #666666;
+  
+  --border-color: #333333;
+  --success: #00E676; /* Green Signal */
+  --error: #FF1744;   /* Red Alert */
+  
+  --font-industrial: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent; /* Mobilde tıklama gölgesini kaldır */
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-industrial);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; /* App-like feel */
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography */
+h1, h2, h3 {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: -0.5px;
+}
+
+/* Industrial Components */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--accent-yellow);
+  color: #000;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(255, 214, 0, 0.2);
+}
+
+.input-field {
+  background: #000;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100%;
+  font-family: var(--font-mono);
+}
+
+.input-field:focus {
+  border-color: var(--accent-yellow);
+  outline: none;
+}
+
+/* Animations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Mobile Scroll Container */
+.scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  padding-bottom: 100px; /* FAB (Floating Action Button) için boşluk */
+}
+
+/* Bottom Actions */
+.bottom-bar {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  padding: 16px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  /* iPhone Safe Area */
+  padding-bottom: env(safe-area-inset-bottom, 20px); 
+}
+
+/* Helpers */
+.text-yellow { color: var(--accent-yellow); }
+.text-muted { color: var(--text-muted); }
+.w-full { width: 100%; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }

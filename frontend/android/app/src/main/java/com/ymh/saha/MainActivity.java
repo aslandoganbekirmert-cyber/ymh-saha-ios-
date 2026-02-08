@@ -1,0 +1,5 @@
+package com.ymh.saha;
+
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {}

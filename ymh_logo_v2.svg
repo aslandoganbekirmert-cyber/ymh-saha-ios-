@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="0 0 600 300">
+  <defs>
+    <style>
+      .heavy { fill: #111; stroke: none; }
+      .pulse { fill: none; stroke: #007AFF; stroke-width: 15; stroke-linecap: butt; stroke-linejoin: bevel; }
+      .light { fill: #FF9500; opacity: 0.8; }
+    </style>
+  </defs>
+
+  <!-- Y (PYLON) -->
+  <!-- Kule ayakları -->
+  <path class="heavy" d="M50,280 L90,140 L110,140 L150,280 L130,280 L100,160 L70,280 Z" />
+  <!-- Üst kollar -->
+  <path class="heavy" d="M60,100 L140,100 L140,120 L60,120 Z" />
+  <!-- Ana direk -->
+  <path class="heavy" d="M90,50 L110,50 L110,160 L90,160 Z" />
+  <!-- İzolatörler (Mavi noktalar) -->
+  <circle cx="60" cy="110" r="5" fill="#007AFF" />
+  <circle cx="140" cy="110" r="5" fill="#007AFF" />
+
+  <!-- M (VOLTAGE PULSE - Sert Zikzak) -->
+  <!-- M harfini oluşturan keskin hat -->
+  <polyline class="pulse" points="180,280 210,120 250,230 290,120 320,280" />
+
+  <!-- H (STREET LIGHT POLE) -->
+  <!-- Sol bacak -->
+  <rect x="360" y="50" width="20" height="230" class="heavy" />
+  <!-- Ara bağlantı -->
+  <rect x="380" y="150" width="60" height="20" class="heavy" />
+  <!-- Sağ bacak (Lamba direği) -->
+  <path class="heavy" d="M440,280 L460,280 L460,80 L500,80 L500,100 L460,100 Z" />
+  <!-- Lamba kafası -->
+  <rect x="460" y="80" width="50" height="20" rx="2" fill="#333" />
+  <!-- Işık hüzmesi (Sert üçgen) -->
+  <path class="light" d="M470,100 L450,280 L520,280 L500,100 Z" />
+
+  <!-- Metin -->
+  <text x="300" y="295" font-family="Arial Black, Helvetica, sans-serif" font-weight="900" font-size="24" text-anchor="middle" fill="#111" letter-spacing="5">Y M H</text>
+</svg>

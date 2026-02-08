@@ -1,0 +1,33 @@
+<svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .heavy { fill: #1A1A1A; stroke: none; }
+      .electric { fill: #007AFF; stroke: none; }
+      .light { fill: #FF9500; stroke: none; }
+    </style>
+  </defs>
+  
+  <!-- Y Harfi: Yüksek Gerilim Direği (Pylon) -->
+  <!-- Sert, köşeli, siyah yapı -->
+  <path class="heavy" d="M80,50 L120,50 L100,100 L100,250 L140,250 L140,280 L60,280 L60,250 L100,250 L100,100 L80,50 Z" />
+  <!-- Üst kollar -->
+  <path class="heavy" d="M40,80 L160,80 L160,100 L140,100 L120,50 L80,50 L60,100 L40,100 Z" />
+  <!-- Elektrik arkı (Mavi) -->
+  <path class="electric" d="M45,90 Q100,140 155,90 L160,85 Q100,135 40,85 Z" />
+
+  <!-- M Harfi: Voltaj Dalgası (Pulse) -->
+  <!-- Keskin zikzak, M harfini oluşturuyor -->
+  <path class="electric" d="M180,250 L210,100 L240,250 L270,100 L300,250 L310,250 L270,50 L240,200 L210,50 L170,250 Z" />
+
+  <!-- H Harfi: Sokak Lambası Direği -->
+  <!-- Sol bacak düz, sağ bacak lamba direği -->
+  <path class="heavy" d="M330,50 L370,50 L370,250 L330,250 Z" /> <!-- Sol bacak -->
+  <path class="heavy" d="M380,150 L420,150 L420,130 Q460,130 480,160 L460,160 Q450,150 420,150 Z" /> <!-- Ara bağlantı -->
+  <!-- Lamba direği kısmı -->
+  <path class="heavy" d="M420,50 L440,50 L440,280 L400,280 L400,250 L420,250 L420,50 Z" />
+  <!-- Işık hüzmesi (Turuncu) -->
+  <path class="light" d="M430,60 L490,280 L450,280 L420,80 Z" opacity="0.8" />
+  
+  <!-- Alt Yazı -->
+  <text x="250" y="295" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="24" text-anchor="middle" fill="#333">YMH SAHA</text>
+</svg>

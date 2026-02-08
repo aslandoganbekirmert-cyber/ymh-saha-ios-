@@ -1,0 +1,43 @@
+<svg width="200" height="100" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- TRANSPARAN ARKA PLAN -->
+    
+    <defs>
+        <style>
+            .text-color { fill: #FFFFFF; } /* Koyu tema için BEYAZ harfler */
+            .accent-color { fill: #FFD600; } /* SAHA'M Sarısı */
+        </style>
+    </defs>
+
+    <!-- Y HARFİ: Yüksek Gerilim Direği (Pylon) -->
+    <!-- Sol bacak -->
+    <path class="text-color" d="M40,150 L60,80 L70,80 L50,150 Z" />
+    <!-- Sağ bacak -->
+    <path class="text-color" d="M110,150 L90,80 L80,80 L100,150 Z" />
+    <!-- Orta Direk -->
+    <rect x="70" y="40" width="10" height="110" class="text-color" />
+    <!-- Üst Kol -->
+    <rect x="40" y="55" width="70" height="8" class="text-color" />
+    <!-- Kafes Detayları (Çaprazlar - Basitleştirilmiş) -->
+    <path stroke="#FFD600" stroke-width="2" d="M50,150 L75,80 M100,150 L75,80" fill="none" opacity="0.5"/>
+
+    <!-- M HARFİ: Elektrik Şimşeği (YMH Bağlantısı) -->
+    <!-- Keskin, agresif şimşek -->
+    <path class="accent-color" d="M130,150 L160,80 L140,80 L170,30 L200,100 L180,100 L210,150 L130,150 Z" stroke="white" stroke-width="2" stroke-linejoin="round" />
+
+    <!-- H HARFİ: Sokak Lambası -->
+    <!-- Sol Direk -->
+    <rect x="240" y="40" width="15" height="110" class="text-color" />
+    <!-- Orta Bağlantı -->
+    <rect x="255" y="90" width="40" height="10" class="text-color" />
+    <!-- Sağ Direk (Lamba Ayağı) -->
+    <rect x="295" y="40" width="15" height="110" class="text-color" />
+    
+    <!-- Lamba Kafası (Tepede) -->
+    <path class="text-color" d="M295,40 L340,40 L340,60 L295,60 Z" />
+    
+    <!-- Işık Hüzmesi (Transparan Sarı) -->
+    <path fill="#FFD600" d="M305,60 L350,150 L285,150 Z" opacity="0.4" />
+
+    <!-- Alt Yazı (İsteğe bağlı, logo yeterli olabilir ama YMH vurgusu için) -->
+    <!-- <text x="200" y="190" font-family="Arial, sans-serif" font-weight="bold" font-size="24" text-anchor="middle" fill="white" letter-spacing="10">YMH</text> -->
+</svg>
