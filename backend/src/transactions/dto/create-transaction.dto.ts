@@ -35,4 +35,7 @@ export class CreateTransactionDto {
     @IsOptional()
     @IsString()
     type?: 'IN' | 'OUT'; // INCOMING or OUTGOING
+
+    @IsOptional()
+    transaction_date?: string; // ISO String (2025-02-09T14:30:00.000Z)
 }
