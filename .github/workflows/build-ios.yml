@@ -42,10 +42,11 @@ jobs:
       - name: Build IPA (Unsigned)
         working-directory: ./frontend/ios
         run: |
-          # Clean & Archive
+          # Clean & Archive (Düzeltildi: -clean yerine clean kullanildi)
           xcodebuild -workspace App/App.xcworkspace \
             -scheme App \
-            -clean archive \
+            -destination 'generic/platform=iOS' \
+            clean archive \
             -archivePath build/App.xcarchive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
