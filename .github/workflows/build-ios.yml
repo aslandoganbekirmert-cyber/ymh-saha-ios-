@@ -33,16 +33,35 @@ jobs:
         run: |
           npm run build
 
-      - name: Add iOS Platform & Sync
+      - name: Recreate iOS Platform (Fix Missing Workspace)
         working-directory: ./frontend
         run: |
-          npx cap add ios || true 
+          echo "Yedekleniyor: Info.plist..."
+          mkdir -p ../temp_backup
+          # Info.plist varsa yedekle (Kamera izinleri icin)
+          if [ -f ios/App/App/Info.plist ]; then
+            cp ios/App/App/Info.plist ../temp_backup/
+          fi
+          
+          echo "Temizleniyor: frontend/ios klasoru..."
+          rm -rf ios
+
+          echo "Yeniden olusturuluyor: iOS Platform..."
+          npx cap add ios
+          
+          # Yedegi Geri Yukle
+          if [ -f ../temp_backup/Info.plist ]; then
+            echo "Geri Yukleniyor: Info.plist..."
+            cp ../temp_backup/Info.plist ios/App/App/
+          fi
+
+          # Sync
           npx cap sync ios
 
       - name: Build IPA (Unsigned)
         working-directory: ./frontend/ios
         run: |
-          # Clean & Archive (Düzeltildi: -clean yerine clean kullanildi)
+          # Clean & Archive
           xcodebuild -workspace App/App.xcworkspace \
             -scheme App \
             -destination 'generic/platform=iOS' \
