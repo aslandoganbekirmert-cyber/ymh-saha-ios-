@@ -119,7 +119,7 @@ function App() {
         const initApp = async () => {
             // A) Sunucu Ayarını Yükle
             const { value: savedUrl } = await Preferences.get({ key: 'server_url' });
-            const activeUrl = savedUrl || 'http://34.52.226.16:3000'; // Sunucu IP'si güncellendi
+            const activeUrl = savedUrl || 'http://35.205.135.232:3000'; // Yeni sunucu IP'si
             setServerUrl(activeUrl);
 
             // B) Network Dinleyicisi
