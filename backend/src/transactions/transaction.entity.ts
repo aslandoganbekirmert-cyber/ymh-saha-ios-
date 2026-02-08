@@ -49,6 +49,9 @@ export class MaterialTransaction {
     @CreateDateColumn()
     created_at: Date;
 
+    @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+    transaction_date: Date;
+
     @Column({ nullable: true })
     notes: string;
 
