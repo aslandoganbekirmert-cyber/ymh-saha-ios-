@@ -113,12 +113,13 @@ function App() {
     // Yeni Proje Formu
     const [newProject, setNewProject] = useState({ name: '', location: '' });
 
+
     /* 1. BAŞLANGIÇ */
     useEffect(() => {
         const initApp = async () => {
             // A) Sunucu Ayarını Yükle
             const { value: savedUrl } = await Preferences.get({ key: 'server_url' });
-            const activeUrl = savedUrl || 'http://localhost:3000';
+            const activeUrl = savedUrl || 'http://34.52.226.16:3000'; // Sunucu IP'si güncellendi
             setServerUrl(activeUrl);
 
             // B) Network Dinleyicisi
@@ -137,10 +138,17 @@ function App() {
             // D) Projeleri Yükle
             loadProjects(activeUrl);
 
-            // E) Konum Check
+            // E) Konum Check (arka planda)
             checkLocationForProject(projects);
         };
         initApp();
+
+        // F) Intro ekranından otomatik çıkış (3 saniye sonra)
+        const introTimeout = setTimeout(() => {
+            setScreen(prev => prev === 'intro' ? 'project-select' : prev);
+        }, 3000);
+
+        return () => clearTimeout(introTimeout);
     }, []);
 
     const showToast = (msg: string, type: 'success' | 'error' | 'info' = 'info') => {
