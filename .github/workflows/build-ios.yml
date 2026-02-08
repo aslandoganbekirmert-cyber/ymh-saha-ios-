@@ -9,6 +9,10 @@ jobs:
   build-ios:
     runs-on: macos-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -19,35 +23,48 @@ jobs:
           node-version: 18
 
       - name: Install Dependencies
+        working-directory: ./frontend
         run: |
-          cd frontend
-          npm install
+          npm ci --legacy-peer-deps
           npm install @capacitor/core @capacitor/cli @capacitor/ios
 
       - name: Build Web App
+        working-directory: ./frontend
         run: |
-          // PWA Plugin hatasını önlemek için build öncesi config düzenlemesi
-          # sed -i '' "s/enabled: false/enabled: true/g" frontend/vite.config.ts || true
-          cd frontend
+          # PWA Plugin hatasını önlemek için build öncesi config düzenlemesi
+          # sed -i '' "s/enabled: false/enabled: true/g" vite.config.ts || true
           npm run build
 
-      - name: Add iOS Platform
+      - name: Add iOS Platform & Sync
+        working-directory: ./frontend
         run: |
-          cd frontend
           npx cap add ios
-          npx cap sync
+          npx cap sync ios
 
       - name: Build IPA (Unsigned)
+        working-directory: ./frontend/ios
         run: |
-          cd frontend/ios
-          xcodebuild -workspace App/App.xcworkspace -scheme App -clean archive -archivePath build/App.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          # Clean & Archive
+          xcodebuild -workspace App/App.xcworkspace \
+            -scheme App \
+            -clean archive \
+            -archivePath build/App.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+          # Create Payload Directory
           mkdir -p build/Payload
+
+          # Copy .app to Payload
           cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
+
+          # Zip Payload into .ipa
           cd build
           zip -r App.ipa Payload
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ymh-saha-ios
+          name: ymh-saha-ios-unsigned
           path: frontend/ios/build/App.ipa
