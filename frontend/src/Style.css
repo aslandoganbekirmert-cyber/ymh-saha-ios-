@@ -1,40 +1,29 @@
-/* === SAHA'M: TITANIUM PRO v7.0 === */
+/* === YMH SAHA PREMIUM V1.0 === */
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* --- PALETTE: TITANIUM DARK --- */
-    --bg-void: #050505;
-    /* Gerçek Siyah */
-    --bg-titanium: #141414;
-    /* Ana Zemin */
-    --bg-surface: #1E1E1E;
-    /* Kartlar */
-    --bg-elevated: #2C2C2E;
-    /* Yükseltilmiş */
+    /* --- PALETTE --- */
+    --bg-void: #0A0A0A;
+    /* Derin Siyah */
+    --bg-card: #18181B;
+    /* Kömür Gri */
+    --bg-elevated: #27272A;
+    /* Açık Kömür */
 
-    /* --- BRAND: CONSTRUCTION GOLD --- */
-    --accent: #FFD600;
-    /* Marka Sarısı */
-    --accent-dim: rgba(255, 214, 0, 0.15);
-    --accent-text: #000000;
+    --gold: #FFD700;
+    /* YMH Altın */
+    --gold-dim: rgba(255, 215, 0, 0.15);
 
-    /* --- STATUS --- */
-    --success: #32D74B;
-    --danger: #FF453A;
-    --warning: #FF9F0A;
+    --text-pri: #FFFFFF;
+    --text-sec: #A1A1AA;
 
-    /* --- TEXT --- */
-    --txt-primary: #FFFFFF;
-    --txt-secondary: #98989E;
-    --txt-tertiary: #505055;
+    --border: rgba(255, 255, 255, 0.08);
 
-    /* --- METRICS --- */
-    --radius-l: 24px;
-    --radius-m: 16px;
-    --radius-s: 12px;
+    --radius-l: 16px;
+    --radius-s: 8px;
 
-    --safe-top: env(safe-area-inset-top, 20px);
-    --safe-bottom: env(safe-area-inset-bottom, 20px);
+    --safe-top: env(safe-area-inset-top, 24px);
+    --safe-bottom: env(safe-area-inset-bottom, 24px);
 }
 
 * {
@@ -46,225 +35,249 @@
 body {
     margin: 0;
     background-color: var(--bg-void);
-    color: var(--txt-primary);
+    color: var(--text-pri);
     font-family: 'Manrope', -apple-system, sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     overflow-x: hidden;
 }
 
 /* === LAYOUT === */
-#app-root {
+.app-shell {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
 }
 
-.view {
-    flex: 1;
-    padding: calc(var(--safe-top) + 20px) 24px calc(var(--safe-bottom) + 90px);
-    opacity: 0;
-    animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-/* === COMPONENTS === */
-
-/* 1. Header */
-.header {
+/* === HEADER & BRAND === */
+.brand-header {
+    background: var(--bg-void);
+    padding: 16px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
 }
 
-.header-title {
-    font-size: 28px;
+.brand-logo-img {
+    height: 32px;
+    width: auto;
+    display: block;
+}
+
+.brand-title {
+    font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.5px;
+    color: #fff;
+    margin-left: 12px;
 }
 
-.header-sub {
-    font-size: 13px;
-    color: var(--txt-secondary);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-}
-
-/* 2. Titanium Cards */
-.t-card {
-    background: var(--bg-surface);
+/* === CARDS (PREMIUM) === */
+.premium-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: var(--radius-l);
     padding: 20px;
     margin-bottom: 16px;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: transform 0.2s;
+    transition: transform 0.2s, background 0.2s;
 }
 
-.t-card:active {
-    transform: scale(0.98);
+.premium-card:active {
     background: var(--bg-elevated);
+    transform: scale(0.99);
 }
 
-.t-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-
-/* 3. Action Buttons */
-.btn {
-    width: 100%;
-    height: 56px;
-    border-radius: var(--radius-m);
-    border: none;
-    font-family: inherit;
+.card-title {
     font-size: 16px;
     font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-primary {
-    background: var(--accent);
-    color: var(--accent-text);
-    box-shadow: 0 4px 20px rgba(255, 214, 0, 0.25);
-}
-
-.btn-primary:active {
-    transform: scale(0.96);
-    box-shadow: none;
-}
-
-.btn-ghost {
-    background: transparent;
-    color: var(--txt-secondary);
-    height: auto;
-    padding: 10px;
-}
-
-/* 4. Inputs (Pro) */
-.input-field {
-    width: 100%;
-    height: 56px;
-    background: var(--bg-elevated);
-    border: 1px solid transparent;
-    border-radius: var(--radius-m);
-    padding: 0 20px;
     color: #fff;
-    font-family: inherit;
-    font-size: 16px;
-    margin-bottom: 20px;
-    transition: 0.3s;
+    margin-bottom: 4px;
 }
 
-.input-field:focus {
-    border-color: var(--accent);
-    background: var(--bg-surface);
-    box-shadow: 0 0 0 4px var(--accent-dim);
+.card-sub {
+    font-size: 13px;
+    color: var(--text-sec);
+}
+
+/* === INPUTS & FORMS === */
+.input-group {
+    margin-bottom: 20px;
 }
 
 .input-label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    color: var(--txt-secondary);
+    color: var(--text-sec);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.premium-input {
+    width: 100%;
+    height: 56px;
+    background: var(--bg-void);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    padding: 0 16px;
+    font-size: 16px;
+    font-family: inherit;
+    color: #fff;
+    transition: 0.2s;
+}
+
+.premium-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold);
+}
+
+/* === BUTTONS (CTA) === */
+.btn-gold {
+    width: 100%;
+    height: 56px;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    border-radius: var(--radius-s);
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+}
+
+.btn-gold:active {
+    transform: translateY(2px);
+    box-shadow: none;
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    width: 100%;
+    height: 56px;
+    background: var(--bg-elevated);
+    color: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* === STATS === */
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.stat-box {
+    background: var(--bg-card);
+    padding: 16px;
+    border-radius: var(--radius-l);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 110px;
+}
+
+.stat-val {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: auto;
+}
+
+.stat-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-sec);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-/* 5. Bottom Navigation (Floating) */
-.nav-dock {
+/* === NAV === */
+.nav-bar {
     position: fixed;
-    bottom: calc(var(--safe-bottom) + 24px);
-    left: 24px;
-    right: 24px;
-    height: 72px;
-    background: rgba(30, 30, 30, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 36px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(24, 24, 27, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    justify-content: space-around;
+    padding: 12px 0 calc(var(--safe-bottom) + 8px);
     z-index: 100;
 }
 
-.nav-btn {
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-sec);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 64px;
+}
+
+.nav-item.active {
+    color: var(--gold);
+}
+
+.nav-fab {
     width: 56px;
     height: 56px;
+    background: var(--gold);
     border-radius: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--txt-secondary);
-    transition: 0.3s;
+    color: #000;
+    transform: translateY(-24px);
+    box-shadow: 0 8px 24px -4px rgba(255, 215, 0, 0.4);
+    border: 4px solid var(--bg-void);
+    /* Cutout */
 }
 
-.nav-btn.active {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.main-fab {
-    width: 64px;
-    height: 64px;
-    border-radius: 32px;
-    background: var(--accent);
-    color: var(--accent-text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 24px rgba(255, 214, 0, 0.4);
-    transform: translateY(-20px);
-    border: 6px solid var(--bg-void);
-}
-
-/* 6. Modal Sheet */
-.modal-backdrop {
+/* === MODAL SHEET === */
+.sheet-backdrop {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
-    z-index: 999;
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
 }
 
-.modal-sheet {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-titanium);
-    border-top-left-radius: 32px;
-    border-top-right-radius: 32px;
-    padding: 32px 24px calc(var(--safe-bottom) + 32px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+.sheet-content {
+    margin-top: auto;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    padding: 24px 24px calc(var(--safe-bottom) + 24px);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     max-height: 90vh;
     overflow-y: auto;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.98);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
 }
 
 @keyframes slideUp {
@@ -277,26 +290,26 @@ body {
     }
 }
 
-/* Utils */
-.flex-col {
+/* === UTILS === */
+.ph-img {
+    width: 100%;
+    height: 140px;
+    background: var(--bg-void);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-s);
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-sec);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    cursor: pointer;
 }
 
-.badge {
-    padding: 6px 12px;
-    border-radius: 100px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.badge.success {
-    background: rgba(50, 215, 75, 0.15);
-    color: var(--success);
-}
-
-.badge.pending {
-    background: rgba(255, 159, 10, 0.15);
-    color: var(--warning);
+.ph-img.has-img {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-dim);
 }
