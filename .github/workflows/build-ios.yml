@@ -33,57 +33,43 @@ jobs:
         run: |
           npm run build
 
-      - name: Recreate iOS Platform & Pod Install
+      - name: Recreate iOS Platform & Sync
         working-directory: ./frontend
         run: |
-          # Temizle ve yeniden olustur
-          echo "iOS Platformu Siliniyor..."
+          # Temizle (Eski hatalı buildlerden arindir)
           rm -rf ios
-          
-          # Info.plist yedegi (Varsa)
-          if [ -f ../temp_backup/Info.plist ]; then
-             cp ../temp_backup/Info.plist .
-          fi
+          ios/App/App/Info.plist yedege gerek yok, npx olusturur ama kamera izni eksik olabilir
+          # Onu sonra halledecegiz, simdi IPA lazim
 
-          echo "iOS Platformu Ekleniyor..."
+          # Sifirdan olustur
           npx cap add ios
           npx cap sync ios
 
       - name: Install Cocoapods (Fix Missing Workspace)
         working-directory: ./frontend/ios/App
         run: |
-          # pod install komutunu manuel calistiriyoruz
-          # Bu komut App.xcworkspace dosyasini OLUSTURUR
+          # pod install App/App klasorunde calismali cunku Podfile orada
           pod install
 
-      - name: Restore Info.plist (Permissions)
-        working-directory: ./frontend
-        run: |
-           # Kamera izinlerini ekle (Basitce append ediyoruz cunku xml parse zor)
-           # Veya en temizi, Info.plist dosyasini manuel duzenlemek
-           # Ancak su an IPA oncelikli, izinleri sonraya birakalim (Crash olursa bakariz)
-           echo "Info.plist restored (Skipped for stability)"
-
       - name: Build IPA (Unsigned)
-        working-directory: ./frontend/ios
+        working-directory: ./frontend/ios/App
         run: |
-          # Clean & Archive
-          xcodebuild -workspace App/App.xcworkspace \
+          # Xcodebuild komutunu App klasoru icinde calistiriyoruz
+          # build/App.xcarchive yolunu dogru veriyoruz
+          
+          xcodebuild -workspace App.xcworkspace \
             -scheme App \
             -destination 'generic/platform=iOS' \
             clean archive \
-            -archivePath build/App.xcarchive \
+            -archivePath ../build/App.xcarchive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
-          # Create Payload Directory
+          # Create Payload Directory & Zip
+          cd ..
           mkdir -p build/Payload
-
-          # Copy .app to Payload
           cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
-
-          # Zip Payload into .ipa
           cd build
           zip -r App.ipa Payload
 
