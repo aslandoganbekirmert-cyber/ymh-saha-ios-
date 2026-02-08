@@ -25,14 +25,13 @@ jobs:
       - name: Install Dependencies
         working-directory: ./frontend
         run: |
-          npm ci --legacy-peer-deps
+          # npm ci yerine npm install kullaniyoruz (package-lock.json eksikse hata vermesin)
+          npm install --legacy-peer-deps
           npm install @capacitor/core @capacitor/cli @capacitor/ios
 
       - name: Build Web App
         working-directory: ./frontend
         run: |
-          # PWA Plugin hatasini onlemek icin build oncesi config duzenlemesi
-          # sed -i '' "s/enabled: false/enabled: true/g" vite.config.ts || true
           npm run build
 
       - name: Add iOS Platform & Sync
