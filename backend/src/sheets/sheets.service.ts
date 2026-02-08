@@ -38,70 +38,69 @@ export class SheetsService {
         }
     }
 
-    async appendRow(spreadsheetId: string, rowData: any[]) {
+    async addSheet(spreadsheetId: string, title: string) {
+        if (!this.client) return;
+        try {
+            const sheets = google.sheets({ version: 'v4', auth: this.client });
+
+            // Önce sayfa var mı kontrol et
+            const doc = await sheets.spreadsheets.get({ spreadsheetId });
+            const existingSheet = doc.data.sheets?.find(s => s.properties?.title === title);
+
+            if (existingSheet) {
+                console.log(`[SheetsService] Sheet '${title}' already exists.`);
+                return existingSheet.properties?.sheetId;
+            }
+
+            // Yoksa yeni sayfa ekle
+            const response = await sheets.spreadsheets.batchUpdate({
+                spreadsheetId,
+                requestBody: {
+                    requests: [{
+                        addSheet: {
+                            properties: { title: title }
+                        }
+                    }]
+                }
+            });
+
+            const newSheetId = response.data.replies?.[0]?.addSheet?.properties?.sheetId;
+            console.log(`[SheetsService] Created new sheet: ${title} (ID: ${newSheetId})`);
+
+            // Başlık satırını ekle
+            await this.appendRow(spreadsheetId, title, [
+                'Tarih', 'Saat', 'Proje', 'Plaka', 'Malzeme', 'Miktar', 'Birim', 'Tedarikçi', 'Fiş No', 'Notlar'
+            ]);
+
+            return newSheetId;
+        } catch (error) {
+            console.error(`[SheetsService] Failed to add sheet '${title}':`, error.message);
+        }
+    }
+
+    async appendRow(spreadsheetId: string, sheetTitle: string, rowData: any[]) {
         if (!this.client) return;
 
         try {
-            // GoogleAuth handles authorization automatically
-            const sheets = google.sheets({ version: 'v4', auth: this.client as any });
+            const sheets = google.sheets({ version: 'v4', auth: this.client });
 
-            const response = await sheets.spreadsheets.values.append({
+            // Sayfa adını range'e ekle (Örn: 'Evka-5!A:J')
+            // Eğer sheetTitle boşsa varsayılan ilk sayfayı kullanır ama biz hep title gönderelim.
+            const range = sheetTitle ? `'${sheetTitle}'!A:J` : 'A:J';
+
+            await sheets.spreadsheets.values.append({
                 spreadsheetId,
-                range: 'A:I', // İlk sayfada A-I kolonları arasına ekle (Daha spesifik)
+                range: range,
                 valueInputOption: 'USER_ENTERED',
-                insertDataOption: 'INSERT_ROWS', // Mevcut satırların üzerine yazmak yerine yeni satır ekle
+                insertDataOption: 'INSERT_ROWS',
                 requestBody: {
                     values: [rowData],
                 },
             });
 
-            // Eklenen satırın indeksini bul
-            const updates = response.data.updates;
-            if (updates && updates.updatedRange) {
-                // Range örneği: 'Sayfa1!A15:I15'
-                const match = updates.updatedRange.match(/[A-Z]+(\d+):[A-Z]+(\d+)/);
-                if (match) {
-                    const startRowIndex = parseInt(match[1]) - 1; // 0-indexed
-                    // const endRowIndex = parseInt(match[2]);
-
-                    // Eğer ilk satır değilse (başlık değilse), bir üst satırın formatını kopyala
-                    if (startRowIndex > 1) {
-                        await sheets.spreadsheets.batchUpdate({
-                            spreadsheetId,
-                            requestBody: {
-                                requests: [
-                                    {
-                                        copyPaste: {
-                                            source: {
-                                                sheetId: 0, // Varsayılan ilk sayfa (Genelde ID 0'dır)
-                                                startRowIndex: startRowIndex - 1,
-                                                endRowIndex: startRowIndex,
-                                                startColumnIndex: 0,
-                                                endColumnIndex: 9 // I kolonu (9. kolon)
-                                            },
-                                            destination: {
-                                                sheetId: 0,
-                                                startRowIndex: startRowIndex,
-                                                endRowIndex: startRowIndex + 1,
-                                                startColumnIndex: 0,
-                                                endColumnIndex: 9
-                                            },
-                                            pasteType: 'PASTE_FORMAT',
-                                            pasteOrientation: 'NORMAL'
-                                        }
-                                    }
-                                ]
-                            }
-                        });
-                        console.log(`[SheetsService] Copied format to row ${startRowIndex + 1}`);
-                    }
-                }
-            }
-
-            console.log(`[SheetsService] Appended row to ${spreadsheetId}`);
+            console.log(`[SheetsService] Appended row to ${spreadsheetId} -> ${sheetTitle}`);
         } catch (error) {
-            console.error('[SheetsService] Failed to append row:', error);
-            // throw error; // Hata fırlatma, çünkü ana akışı bozmasın (Transaction kaydedilsin)
+            console.error('[SheetsService] Failed to append row:', error.message);
         }
     }
 }
