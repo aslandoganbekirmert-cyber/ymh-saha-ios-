@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout Source Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -26,6 +26,8 @@ jobs:
 
       - name: Build Web App
         run: |
+          // PWA Plugin hatasını önlemek için build öncesi config düzenlemesi
+          # sed -i '' "s/enabled: false/enabled: true/g" frontend/vite.config.ts || true
           cd frontend
           npm run build
 
@@ -45,7 +47,7 @@ jobs:
           zip -r App.ipa Payload
 
       - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ymh-saha-ios
           path: frontend/ios/build/App.ipa
