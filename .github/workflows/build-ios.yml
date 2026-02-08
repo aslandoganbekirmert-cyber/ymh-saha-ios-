@@ -33,30 +33,22 @@ jobs:
         run: |
           npm run build
 
-      - name: Recreate iOS Platform & Sync
+      - name: Recreate iOS Platform
         working-directory: ./frontend
         run: |
-          # Temizle (Eski hatalı buildlerden arindir)
           rm -rf ios
-          ios/App/App/Info.plist yedege gerek yok, npx olusturur ama kamera izni eksik olabilir
-          # Onu sonra halledecegiz, simdi IPA lazim
-
-          # Sifirdan olustur
           npx cap add ios
           npx cap sync ios
 
-      - name: Install Cocoapods (Fix Missing Workspace)
+      - name: Install Cocoapods
         working-directory: ./frontend/ios/App
         run: |
-          # pod install App/App klasorunde calismali cunku Podfile orada
           pod install
 
       - name: Build IPA (Unsigned)
         working-directory: ./frontend/ios/App
         run: |
-          # Xcodebuild komutunu App klasoru icinde calistiriyoruz
-          # build/App.xcarchive yolunu dogru veriyoruz
-          
+          # Clean & Archive
           xcodebuild -workspace App.xcworkspace \
             -scheme App \
             -destination 'generic/platform=iOS' \
@@ -66,8 +58,9 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
-          # Create Payload Directory & Zip
-          cd ..
+      - name: Package Payload (IPA)
+        working-directory: ./frontend/ios
+        run: |
           mkdir -p build/Payload
           cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
           cd build
