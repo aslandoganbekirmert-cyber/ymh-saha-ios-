@@ -1,0 +1,302 @@
+/* === SAHA'M: TITANIUM PRO v7.0 === */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* --- PALETTE: TITANIUM DARK --- */
+    --bg-void: #050505;
+    /* Gerçek Siyah */
+    --bg-titanium: #141414;
+    /* Ana Zemin */
+    --bg-surface: #1E1E1E;
+    /* Kartlar */
+    --bg-elevated: #2C2C2E;
+    /* Yükseltilmiş */
+
+    /* --- BRAND: CONSTRUCTION GOLD --- */
+    --accent: #FFD600;
+    /* Marka Sarısı */
+    --accent-dim: rgba(255, 214, 0, 0.15);
+    --accent-text: #000000;
+
+    /* --- STATUS --- */
+    --success: #32D74B;
+    --danger: #FF453A;
+    --warning: #FF9F0A;
+
+    /* --- TEXT --- */
+    --txt-primary: #FFFFFF;
+    --txt-secondary: #98989E;
+    --txt-tertiary: #505055;
+
+    /* --- METRICS --- */
+    --radius-l: 24px;
+    --radius-m: 16px;
+    --radius-s: 12px;
+
+    --safe-top: env(safe-area-inset-top, 20px);
+    --safe-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-void);
+    color: var(--txt-primary);
+    font-family: 'Manrope', -apple-system, sans-serif;
+    font-size: 16px;
+    overflow-x: hidden;
+}
+
+/* === LAYOUT === */
+#app-root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.view {
+    flex: 1;
+    padding: calc(var(--safe-top) + 20px) 24px calc(var(--safe-bottom) + 90px);
+    opacity: 0;
+    animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* === COMPONENTS === */
+
+/* 1. Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 24px;
+}
+
+.header-title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.header-sub {
+    font-size: 13px;
+    color: var(--txt-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+/* 2. Titanium Cards */
+.t-card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-l);
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s;
+}
+
+.t-card:active {
+    transform: scale(0.98);
+    background: var(--bg-elevated);
+}
+
+.t-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* 3. Action Buttons */
+.btn {
+    width: 100%;
+    height: 56px;
+    border-radius: var(--radius-m);
+    border: none;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--accent-text);
+    box-shadow: 0 4px 20px rgba(255, 214, 0, 0.25);
+}
+
+.btn-primary:active {
+    transform: scale(0.96);
+    box-shadow: none;
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--txt-secondary);
+    height: auto;
+    padding: 10px;
+}
+
+/* 4. Inputs (Pro) */
+.input-field {
+    width: 100%;
+    height: 56px;
+    background: var(--bg-elevated);
+    border: 1px solid transparent;
+    border-radius: var(--radius-m);
+    padding: 0 20px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+    margin-bottom: 20px;
+    transition: 0.3s;
+}
+
+.input-field:focus {
+    border-color: var(--accent);
+    background: var(--bg-surface);
+    box-shadow: 0 0 0 4px var(--accent-dim);
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--txt-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 5. Bottom Navigation (Floating) */
+.nav-dock {
+    position: fixed;
+    bottom: calc(var(--safe-bottom) + 24px);
+    left: 24px;
+    right: 24px;
+    height: 72px;
+    background: rgba(30, 30, 30, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    z-index: 100;
+}
+
+.nav-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--txt-secondary);
+    transition: 0.3s;
+}
+
+.nav-btn.active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.main-fab {
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    background: var(--accent);
+    color: var(--accent-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(255, 214, 0, 0.4);
+    transform: translateY(-20px);
+    border: 6px solid var(--bg-void);
+}
+
+/* 6. Modal Sheet */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 999;
+}
+
+.modal-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-titanium);
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+    padding: 32px 24px calc(var(--safe-bottom) + 32px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Utils */
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge.success {
+    background: rgba(50, 215, 75, 0.15);
+    color: var(--success);
+}
+
+.badge.pending {
+    background: rgba(255, 159, 10, 0.15);
+    color: var(--warning);
+}
