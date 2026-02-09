@@ -1,6 +1,24 @@
 version: '3.8'
 
 services:
+  # BACKEND SERVICE (API)
+  api:
+    build: .
+    container_name: ymh_api
+    restart: always # UYGULAMA ASLA DURMAZ
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - POSTGRES_USER=ymh_user
+      - POSTGRES_PASSWORD=ymh_password
+      - POSTGRES_DB=ymh_db
+      - JWT_SECRET=ymh_secret_key_123
+    depends_on:
+      - db
+
+  # DATABASE SERVICE
   db:
     image: postgres:15-alpine
     container_name: ymh_postgres
