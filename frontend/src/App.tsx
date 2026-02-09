@@ -13,40 +13,30 @@ import {
     AlertTriangle,
     X,
     Building2,
-    FileText,
     MapPin,
     Calendar,
-    Settings
+    Settings,
+    Loader2
 } from 'lucide-react';
 
 /* --- AYARLAR --- */
-// Proxy üzerinden gideceği için sadece /api yeterli
-const API_URL = '/api';
+const API_URL = '/api'; // Proxy üzerinden
 
 /* --- TİPLER --- */
-interface Project {
-    id: string;
-    name: string;
-    location: string;
-}
-
+interface Project { id: string; name: string; location: string }
 interface Transaction {
-    id: string;
-    plate_no: string;
-    company?: string;
-    invoice_no?: string;
-    material: string;
-    quantity: number;
-    unit: string;
-    notes?: string;
-    image_url?: string;
-    created_at?: string;
+    id: string; plate_no: string; company?: string; invoice_no?: string;
+    material: string; quantity: number; unit: string; notes?: string;
+    image_url?: string; created_at?: string;
 }
 
 export default function App() {
     /* --- STATE --- */
     const [view, setView] = useState<'auth' | 'dashboard' | 'camera' | 'new-site'>('auth');
     const [loading, setLoading] = useState(false);
+
+    // Toast
+    const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
     // Veriler
     const [projects, setProjects] = useState<Project[]>([]);
@@ -55,24 +45,19 @@ export default function App() {
 
     // Formlar
     const [newSiteName, setNewSiteName] = useState('');
-
-    // DETAYLI İRSALİYE FORMU
     const [wbForm, setWbForm] = useState({
-        plate: '',
-        company: '',
-        invoice_no: '',
-        material: 'Hazır Beton C30',
-        qty: '',
-        unit: 'Ton',
-        notes: '',
-        imgBlob: null as Blob | null,
-        imgPreview: ''
+        plate: '', company: '', invoice_no: '', material: 'Hazır Beton C30',
+        qty: '', unit: 'Ton', notes: '', imgBlob: null as Blob | null, imgPreview: ''
     });
 
-    /* --- BAŞLANGIÇ --- */
-    useEffect(() => {
-        loadProjects();
-    }, []);
+    /* --- TOAST --- */
+    const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+        setToast({ msg, type });
+        setTimeout(() => setToast(null), 3000);
+    };
+
+    /* --- INIT --- */
+    useEffect(() => { loadProjects(); }, []);
 
     const loadProjects = async () => {
         setLoading(true);
@@ -81,152 +66,124 @@ export default function App() {
             if (res.ok) {
                 const data = await res.json();
                 setProjects(data);
-
-                // Son oturumu kontrol et
                 const lastId = localStorage.getItem('last_site_id');
                 if (lastId) {
                     const saved = data.find((p: Project) => p.id === lastId);
                     if (saved) openDashboard(saved);
                 }
-            } else {
-                console.error('API Hatası:', res.status);
-            }
-        } catch (e) {
-            console.error('Bağlantı Hatası:', e);
-        } finally {
-            setLoading(false);
-        }
+            } else showToast('Projeler Yüklenemedi', 'error');
+        } catch { showToast('Bağlantı Hatası', 'error'); }
+        finally { setLoading(false); }
     };
 
-    /* --- İŞLEMLER --- */
+    /* --- ACTIONS --- */
     const openDashboard = async (p: Project) => {
         setActiveProject(p);
         localStorage.setItem('last_site_id', p.id);
         setView('dashboard');
-
-        // Verileri Yükle
         try {
             const res = await fetch(`${API_URL}/transactions?project_id=${p.id}`);
             if (res.ok) setTransactions(await res.json());
-        } catch (e) { console.error(e); }
+        } catch { }
     };
 
     const createSite = async () => {
-        if (!newSiteName) return alert('Şantiye adı giriniz.');
+        if (!newSiteName) return showToast('Şantiye adı giriniz', 'error');
         setLoading(true);
-
         try {
-            // Konum
             let lat = 0, lng = 0;
             try {
                 const pos = await Geolocation.getCurrentPosition();
-                lat = pos.coords.latitude;
-                lng = pos.coords.longitude;
-            } catch (e) { console.log('GPS alınamadı'); }
+                lat = pos.coords.latitude; lng = pos.coords.longitude;
+            } catch { }
 
             const res = await fetch(`${API_URL}/projects`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newSiteName, location: 'Konum Alındı', gps_lat: lat, gps_lng: lng })
+                body: JSON.stringify({ name: newSiteName, location: 'Mobil Konum', gps_lat: lat, gps_lng: lng })
             });
 
             if (res.ok) {
                 const newP = await res.json();
                 setProjects([...projects, newP]);
-                setView('auth');
-                setNewSiteName('');
+                setView('auth'); setNewSiteName('');
+                showToast('Şantiye Oluşturuldu');
                 openDashboard(newP);
-            } else {
-                alert('Sunucu hatası. Kayıt yapılamadı.');
-            }
-        } catch (e) {
-            alert('Bağlantı hatası.');
-        } finally {
-            setLoading(false);
-        }
+            } else showToast('Kayıt Başarısız', 'error');
+        } catch { showToast('Hata Oluştu', 'error'); }
+        finally { setLoading(false); }
     };
 
     const takePhoto = async () => {
         try {
             const image = await Camera.getPhoto({
-                quality: 70,
-                allowEditing: false,
-                resultType: CameraResultType.Uri,
-                saveToGallery: false // Galeriye kaydetme, sadece geçici
+                quality: 65, allowEditing: false, resultType: CameraResultType.Uri,
+                saveToGallery: false // Galeri kirliliği yapma
             });
-
-            // Blob'a çevir
             const response = await fetch(image.webPath!);
             const blob = await response.blob();
-
             setWbForm(prev => ({ ...prev, imgBlob: blob, imgPreview: image.webPath! }));
-        } catch (e) {
-            console.log('Kamera iptal edildi');
-        }
-    };
-
-    const removePhoto = () => {
-        setWbForm(prev => ({ ...prev, imgBlob: null, imgPreview: '' }));
+        } catch { console.log('Kamera iptal'); }
     };
 
     const saveWaybill = async () => {
         if (!activeProject) return;
-        if (!wbForm.qty && !wbForm.imgBlob) return alert('En azından Miktar girin veya Fotoğraf ekleyin.');
+        if (!wbForm.qty && !wbForm.imgBlob) return showToast('Miktar veya Fotoğraf gerekli!', 'error');
 
         setLoading(true);
         try {
-            const formData = new FormData();
-            formData.append('project_id', activeProject.id);
+            const fd = new FormData();
+            fd.append('project_id', activeProject.id);
+            fd.append('plate_no', wbForm.plate || 'PLAKA YOK');
+            fd.append('company', wbForm.company || '');
+            fd.append('invoice_no', wbForm.invoice_no || '');
+            fd.append('material', wbForm.material);
+            fd.append('quantity', wbForm.qty || '0');
+            fd.append('unit', wbForm.unit);
+            fd.append('notes', wbForm.notes || '');
 
-            // Tüm alanları ekle
-            formData.append('plate_no', wbForm.plate || 'PLAKA YOK');
-            formData.append('company', wbForm.company || '');
-            formData.append('invoice_no', wbForm.invoice_no || '');
-            formData.append('material', wbForm.material);
-            formData.append('quantity', wbForm.qty || '0');
-            formData.append('unit', wbForm.unit);
-            formData.append('notes', wbForm.notes || '');
+            if (wbForm.imgBlob) fd.append('file', wbForm.imgBlob, 'photo.jpg');
 
-            if (wbForm.imgBlob) {
-                formData.append('file', wbForm.imgBlob, 'photo.jpg');
-            }
-
-            // Konum Ekle
             try {
                 const pos = await Geolocation.getCurrentPosition();
-                formData.append('gps_lat', String(pos.coords.latitude));
-                formData.append('gps_lng', String(pos.coords.longitude));
-            } catch (e) { }
+                fd.append('gps_lat', String(pos.coords.latitude));
+                fd.append('gps_lng', String(pos.coords.longitude));
+            } catch { }
 
-            const res = await fetch(`${API_URL}/transactions`, {
-                method: 'POST',
-                body: formData
-            });
+            const res = await fetch(`${API_URL}/transactions`, { method: 'POST', body: fd });
 
             if (res.ok) {
                 const newTx = await res.json();
                 setTransactions([newTx, ...transactions]);
                 setView('dashboard');
-                // Formu Sıfırla
                 setWbForm({
-                    plate: '', company: '', invoice_no: '',
-                    material: 'Hazır Beton C30', qty: '', unit: 'Ton',
-                    notes: '', imgBlob: null, imgPreview: ''
+                    plate: '', company: '', invoice_no: '', material: 'Hazır Beton C30',
+                    qty: '', unit: 'Ton', notes: '', imgBlob: null, imgPreview: ''
                 });
-            } else {
-                alert('Sunucu kayıt etmedi. Tekrar deneyin.');
-            }
+                showToast('Kayıt Başarılı!');
+            } else showToast('Sunucu Kaydetmedi', 'error');
 
-        } catch (e) {
-            alert('Gönderim sırasında hata oluştu.');
-        } finally {
-            setLoading(false);
-        }
+        } catch { showToast('Gönderim Hatası', 'error'); }
+        finally { setLoading(false); }
     };
 
-    /* --- EKRANLAR --- */
+    /* --- COMPONENTS --- */
+    const Toast = () => (
+        toast ? (
+            <div style={{
+                position: 'fixed', bottom: 40, left: 20, right: 20,
+                backgroundColor: toast.type === 'success' ? '#10B981' : '#EF4444',
+                color: '#fff', padding: '12px 20px', borderRadius: 12,
+                fontWeight: 600, textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+                zIndex: 9999, animation: 'slideUp 0.3s ease-out'
+            }}>
+                {toast.type === 'success' ? <CheckCircle size={16} style={{ display: 'inline', marginRight: 8, verticalAlign: 'text-bottom' }} /> : <AlertTriangle size={16} style={{ display: 'inline', marginRight: 8, verticalAlign: 'text-bottom' }} />}
+                {toast.msg}
+            </div>
+        ) : null
+    );
 
-    // 1. ŞANTİYE SEÇİMİ
+    // 1. PROJECT LOGIN
     if (view === 'auth') return (
         <div id="root">
             <div className="header-bar" style={{ justifyContent: 'center' }}>
@@ -234,15 +191,15 @@ export default function App() {
             </div>
 
             <div className="content-scroll">
-                <div className="form-label" style={{ marginBottom: 16 }}>ŞANTİYE SEÇİMİ</div>
+                <div className="form-label">ŞANTİYE LİSTESİ</div>
 
-                {loading && <div style={{ textAlign: 'center', padding: 20 }}>Yükleniyor...</div>}
-                {!loading && projects.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>Kayıtlı şantiye yok.</div>}
+                {loading && <div style={{ textAlign: 'center', padding: 20 }}><Loader2 className="animate-spin" /> Yükleniyor...</div>}
+                {!loading && projects.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>Kayıtlı şantiye bulunamadı.</div>}
 
                 {projects.map(p => (
                     <button key={p.id} className="btn-action btn-secondary" style={{ marginBottom: 12, justifyContent: 'space-between', padding: '0 20px', textTransform: 'none' }} onClick={() => openDashboard(p)}>
                         <span style={{ fontWeight: 700 }}>{p.name}</span>
-                        <Truck size={20} color="#000" />
+                        <Truck size={20} />
                     </button>
                 ))}
 
@@ -251,10 +208,11 @@ export default function App() {
                     <Plus size={24} /> YENİ ŞANTİYE
                 </button>
             </div>
+            <Toast />
         </div>
     );
 
-    // 2. YENİ ŞANTİYE
+    // 2. NEW PROJECT
     if (view === 'new-site') return (
         <div className="modal-layer">
             <div className="modal-header">
@@ -273,13 +231,13 @@ export default function App() {
                     {loading ? 'KAYDEDİLİYOR...' : 'BAŞLAT'}
                 </button>
             </div>
+            <Toast />
         </div>
     );
 
     // 3. DASHBOARD
     if (view === 'dashboard') {
         const totalTon = transactions.reduce((acc, t) => acc + Number(t.quantity || 0), 0);
-
         return (
             <div id="root">
                 <div className="header-bar">
@@ -326,12 +284,14 @@ export default function App() {
                             </div>
                         </div>
                     ))}
+                    {transactions.length === 0 && <div style={{ textAlign: 'center', color: '#999', padding: 20 }}>Henüz kayıt yok.</div>}
                 </div>
+                <Toast />
             </div>
         );
     }
 
-    // 4. DETAYLI GİRİŞ FORMU
+    // 4. DETAYLI FORM
     if (view === 'camera') return (
         <div className="modal-layer" style={{ overflowY: 'auto' }}>
             <div className="modal-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
@@ -340,12 +300,13 @@ export default function App() {
             </div>
 
             <div className="content-scroll">
-                {/* KAMERA BÖLÜMÜ */}
+                {/* KAMERA */}
                 <div className={`camera-trigger ${wbForm.imgPreview ? 'filled' : ''}`} onClick={wbForm.imgPreview ? undefined : takePhoto}>
                     {wbForm.imgPreview ? (
                         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                             <img src={wbForm.imgPreview} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }} />
-                            <div onClick={removePhoto} style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.6)', color: '#fff', padding: 8, borderRadius: 20 }}>
+                            <div onClick={() => setWbForm(prev => ({ ...prev, imgBlob: null, imgPreview: '' }))}
+                                style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.6)', color: '#fff', padding: 8, borderRadius: 20 }}>
                                 <X size={20} />
                             </div>
                         </div>
@@ -358,7 +319,6 @@ export default function App() {
                     )}
                 </div>
 
-                {/* DETAYLI FORM */}
                 <div className="stat-row">
                     <div className="form-group">
                         <label className="form-label">İRSALİYE NO</label>
@@ -403,7 +363,7 @@ export default function App() {
                 </div>
 
                 <div className="form-group">
-                    <label className="form-label">AÇIKLAMA (OPSİYONEL)</label>
+                    <label className="form-label">AÇIKLAMA</label>
                     <textarea
                         className="form-input"
                         style={{ height: 80, resize: 'none', paddingTop: 12 }}
@@ -417,6 +377,7 @@ export default function App() {
                     {loading ? 'KAYDEDİLİYOR...' : 'KAYDET VE GÖNDER'}
                 </button>
             </div>
+            <Toast />
         </div>
     );
 }
