@@ -1,14 +1,14 @@
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+// import { VitePWA } from 'vite-plugin-pwa' // PATH sorunu yüzünden devre dışı
 
 export default defineConfig({
   server: {
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // Yerel Backend (En stabil)
+        target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
@@ -16,7 +16,8 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    VitePWA({
+    /* 
+    VitePWA({ 
       registerType: 'autoUpdate',
       devOptions: { enabled: true },
       manifest: {
@@ -40,6 +41,7 @@ export default defineConfig({
           }
         ]
       }
-    })
+    }) 
+    */
   ]
 })
