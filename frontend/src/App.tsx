@@ -2,22 +2,26 @@
 import React, { useState, useEffect } from 'react';
 import './Style.css';
 import { Camera, CameraResultType } from '@capacitor/camera';
-import { Geolocation } from '@capacitor/geolocation'; // Konum için
+import { Geolocation } from '@capacitor/geolocation';
 import {
-    Users,
     Plus,
     Camera as CameraIcon,
     ArrowLeft,
-    MapPin,
     Truck,
     LogOut,
     CheckCircle,
     AlertTriangle,
-    RefreshCw
+    X,
+    Building2,
+    FileText,
+    MapPin,
+    Calendar,
+    Settings
 } from 'lucide-react';
 
 /* --- AYARLAR --- */
-const API_URL = 'http://localhost:3000'; // Yerel Geliştirme Sunucusu
+// Proxy üzerinden gideceği için sadece /api yeterli
+const API_URL = '/api';
 
 /* --- TİPLER --- */
 interface Project {
@@ -29,9 +33,12 @@ interface Project {
 interface Transaction {
     id: string;
     plate_no: string;
+    company?: string;
+    invoice_no?: string;
     material: string;
     quantity: number;
     unit: string;
+    notes?: string;
     image_url?: string;
     created_at?: string;
 }
@@ -48,11 +55,16 @@ export default function App() {
 
     // Formlar
     const [newSiteName, setNewSiteName] = useState('');
+
+    // DETAYLI İRSALİYE FORMU
     const [wbForm, setWbForm] = useState({
         plate: '',
-        material: 'Hazır Beton',
+        company: '',
+        invoice_no: '',
+        material: 'Hazır Beton C30',
         qty: '',
         unit: 'Ton',
+        notes: '',
         imgBlob: null as Blob | null,
         imgPreview: ''
     });
@@ -77,11 +89,10 @@ export default function App() {
                     if (saved) openDashboard(saved);
                 }
             } else {
-                alert('Sunucuya erişilemedi. İnternet bağlantınızı kontrol edin.');
+                console.error('API Hatası:', res.status);
             }
         } catch (e) {
-            console.error(e);
-            alert('Bağlantı Hatası!');
+            console.error('Bağlantı Hatası:', e);
         } finally {
             setLoading(false);
         }
@@ -101,22 +112,22 @@ export default function App() {
     };
 
     const createSite = async () => {
-        if (!newSiteName) return alert('Şantiye adı boş olamaz!');
+        if (!newSiteName) return alert('Şantiye adı giriniz.');
         setLoading(true);
 
         try {
-            // Konum almayı dene (Opsiyonel)
+            // Konum
             let lat = 0, lng = 0;
             try {
                 const pos = await Geolocation.getCurrentPosition();
                 lat = pos.coords.latitude;
                 lng = pos.coords.longitude;
-            } catch (e) { console.log('GPS alınamadı, devam ediliyor.'); }
+            } catch (e) { console.log('GPS alınamadı'); }
 
             const res = await fetch(`${API_URL}/projects`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newSiteName, location: 'Saha Konumu', gps_lat: lat, gps_lng: lng })
+                body: JSON.stringify({ name: newSiteName, location: 'Konum Alındı', gps_lat: lat, gps_lng: lng })
             });
 
             if (res.ok) {
@@ -124,12 +135,12 @@ export default function App() {
                 setProjects([...projects, newP]);
                 setView('auth');
                 setNewSiteName('');
-                openDashboard(newP); // Direkt gir
+                openDashboard(newP);
             } else {
-                alert('Oluşturma başarısız.');
+                alert('Sunucu hatası. Kayıt yapılamadı.');
             }
         } catch (e) {
-            alert('Hata oluştu.');
+            alert('Bağlantı hatası.');
         } finally {
             setLoading(false);
         }
@@ -138,9 +149,10 @@ export default function App() {
     const takePhoto = async () => {
         try {
             const image = await Camera.getPhoto({
-                quality: 60,
+                quality: 70,
                 allowEditing: false,
-                resultType: CameraResultType.Uri
+                resultType: CameraResultType.Uri,
+                saveToGallery: false // Galeriye kaydetme, sadece geçici
             });
 
             // Blob'a çevir
@@ -148,21 +160,32 @@ export default function App() {
             const blob = await response.blob();
 
             setWbForm(prev => ({ ...prev, imgBlob: blob, imgPreview: image.webPath! }));
-        } catch (e) { console.log('Kamera iptal'); }
+        } catch (e) {
+            console.log('Kamera iptal edildi');
+        }
+    };
+
+    const removePhoto = () => {
+        setWbForm(prev => ({ ...prev, imgBlob: null, imgPreview: '' }));
     };
 
     const saveWaybill = async () => {
         if (!activeProject) return;
-        if (!wbForm.qty && !wbForm.imgBlob) return alert('Miktar girin veya fotoğraf çekin.');
+        if (!wbForm.qty && !wbForm.imgBlob) return alert('En azından Miktar girin veya Fotoğraf ekleyin.');
 
         setLoading(true);
         try {
             const formData = new FormData();
             formData.append('project_id', activeProject.id);
+
+            // Tüm alanları ekle
             formData.append('plate_no', wbForm.plate || 'PLAKA YOK');
+            formData.append('company', wbForm.company || '');
+            formData.append('invoice_no', wbForm.invoice_no || '');
             formData.append('material', wbForm.material);
             formData.append('quantity', wbForm.qty || '0');
             formData.append('unit', wbForm.unit);
+            formData.append('notes', wbForm.notes || '');
 
             if (wbForm.imgBlob) {
                 formData.append('file', wbForm.imgBlob, 'photo.jpg');
@@ -184,13 +207,18 @@ export default function App() {
                 const newTx = await res.json();
                 setTransactions([newTx, ...transactions]);
                 setView('dashboard');
-                setWbForm({ plate: '', material: 'Hazır Beton', qty: '', unit: 'Ton', imgBlob: null, imgPreview: '' });
+                // Formu Sıfırla
+                setWbForm({
+                    plate: '', company: '', invoice_no: '',
+                    material: 'Hazır Beton C30', qty: '', unit: 'Ton',
+                    notes: '', imgBlob: null, imgPreview: ''
+                });
             } else {
-                alert('Kayıt başarısız oldu.');
+                alert('Sunucu kayıt etmedi. Tekrar deneyin.');
             }
 
         } catch (e) {
-            alert('Gönderim hatası!');
+            alert('Gönderim sırasında hata oluştu.');
         } finally {
             setLoading(false);
         }
@@ -198,7 +226,7 @@ export default function App() {
 
     /* --- EKRANLAR --- */
 
-    // 1. ŞANTİYE SEÇİMİ (AUTH)
+    // 1. ŞANTİYE SEÇİMİ
     if (view === 'auth') return (
         <div id="root">
             <div className="header-bar" style={{ justifyContent: 'center' }}>
@@ -206,8 +234,10 @@ export default function App() {
             </div>
 
             <div className="content-scroll">
-                <div className="form-label">ŞANTİYE SEÇİMİ</div>
-                {projects.length === 0 && !loading && <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>Kayıtlı şantiye yok.</div>}
+                <div className="form-label" style={{ marginBottom: 16 }}>ŞANTİYE SEÇİMİ</div>
+
+                {loading && <div style={{ textAlign: 'center', padding: 20 }}>Yükleniyor...</div>}
+                {!loading && projects.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>Kayıtlı şantiye yok.</div>}
 
                 {projects.map(p => (
                     <button key={p.id} className="btn-action btn-secondary" style={{ marginBottom: 12, justifyContent: 'space-between', padding: '0 20px', textTransform: 'none' }} onClick={() => openDashboard(p)}>
@@ -221,10 +251,6 @@ export default function App() {
                     <Plus size={24} /> YENİ ŞANTİYE
                 </button>
             </div>
-
-            {loading && <div className="modal-layer" style={{ background: 'rgba(255,255,255,0.8)', alignItems: 'center', justifyContent: 'center' }}>
-                <div>YÜKLENİYOR...</div>
-            </div>}
         </div>
     );
 
@@ -237,19 +263,21 @@ export default function App() {
             </div>
             <div style={{ padding: 20 }}>
                 <div className="form-group">
-                    <label className="form-label">PROJE / ŞANTİYE ADI</label>
+                    <label className="form-label">PROJE ADI</label>
                     <input className="form-input" placeholder="ÖRN: MERKEZ DEPO" value={newSiteName} onChange={e => setNewSiteName(e.target.value)} autoFocus />
                 </div>
+                <div style={{ fontSize: 13, color: '#666', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <MapPin size={16} /> Konum otomatik alınacaktır.
+                </div>
                 <button className="btn-action" onClick={createSite} disabled={loading}>
-                    {loading ? 'KAYDEDİLİYOR...' : 'OLUŞTUR VE GİR'}
+                    {loading ? 'KAYDEDİLİYOR...' : 'BAŞLAT'}
                 </button>
             </div>
         </div>
     );
 
-    // 3. DASHBOARD (ANA EKRAN)
+    // 3. DASHBOARD
     if (view === 'dashboard') {
-        // İstatistik
         const totalTon = transactions.reduce((acc, t) => acc + Number(t.quantity || 0), 0);
 
         return (
@@ -272,12 +300,12 @@ export default function App() {
                         </div>
                         <div className="stat-item" style={{ background: '#FFD600', borderColor: '#E5C300' }}>
                             <div className="stat-val">{totalTon}</div>
-                            <div className="stat-tag" style={{ color: '#000' }}>TOPLAM TONAJ</div>
+                            <div className="stat-tag" style={{ color: '#000' }}>TOPLAM MİKTAR</div>
                         </div>
                     </div>
 
                     <button className="btn-action" style={{ marginBottom: 24 }} onClick={() => setView('camera')}>
-                        <CameraIcon /> YENİ GİRİŞ YAP
+                        <Plus /> YENİ GİRİŞ EKLE
                     </button>
 
                     <div className="form-label">SON HAREKETLER</div>
@@ -290,8 +318,11 @@ export default function App() {
                                     <div style={{ fontSize: 12, color: '#666' }}>{t.material}</div>
                                 </div>
                             </div>
-                            <div style={{ fontWeight: 800, fontSize: 18 }}>
-                                {t.quantity} <span style={{ fontSize: 12 }}>{t.unit}</span>
+                            <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontWeight: 800, fontSize: 18 }}>
+                                    {t.quantity} <span style={{ fontSize: 12 }}>{t.unit}</span>
+                                </div>
+                                <div style={{ fontSize: 11, color: '#999' }}>{t.created_at?.split('T')[0]}</div>
                             </div>
                         </div>
                     ))}
@@ -300,21 +331,24 @@ export default function App() {
         );
     }
 
-    // 4. KAMERA / GİRİŞ EKRANI
+    // 4. DETAYLI GİRİŞ FORMU
     if (view === 'camera') return (
-        <div className="modal-layer">
-            <div className="modal-header">
+        <div className="modal-layer" style={{ overflowY: 'auto' }}>
+            <div className="modal-header" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <div style={{ fontWeight: 800 }}>YENİ İRSALİYE</div>
                 <div onClick={() => setView('dashboard')} style={{ padding: 10 }}><ArrowLeft /></div>
             </div>
 
             <div className="content-scroll">
-                <div className={`camera-trigger ${wbForm.imgPreview ? 'filled' : ''}`} onClick={takePhoto}>
+                {/* KAMERA BÖLÜMÜ */}
+                <div className={`camera-trigger ${wbForm.imgPreview ? 'filled' : ''}`} onClick={wbForm.imgPreview ? undefined : takePhoto}>
                     {wbForm.imgPreview ? (
-                        <>
-                            <CheckCircle size={48} style={{ marginBottom: 8 }} />
-                            <div style={{ fontWeight: 700 }}>FOTOĞRAF ALINDI</div>
-                        </>
+                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <img src={wbForm.imgPreview} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }} />
+                            <div onClick={removePhoto} style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.6)', color: '#fff', padding: 8, borderRadius: 20 }}>
+                                <X size={20} />
+                            </div>
+                        </div>
                     ) : (
                         <>
                             <CameraIcon size={48} style={{ marginBottom: 8 }} />
@@ -324,28 +358,63 @@ export default function App() {
                     )}
                 </div>
 
+                {/* DETAYLI FORM */}
                 <div className="stat-row">
                     <div className="form-group">
-                        <label className="form-label">PLAKA (OPSİYONEL)</label>
-                        <input className="form-input" placeholder="35.." value={wbForm.plate} onChange={e => setWbForm({ ...wbForm, plate: e.target.value.toUpperCase() })} />
+                        <label className="form-label">İRSALİYE NO</label>
+                        <input className="form-input" placeholder="123456" value={wbForm.invoice_no} onChange={e => setWbForm({ ...wbForm, invoice_no: e.target.value })} />
                     </div>
                     <div className="form-group">
-                        <label className="form-label">MİKTAR</label>
-                        <input type="number" className="form-input" placeholder="0" value={wbForm.qty} onChange={e => setWbForm({ ...wbForm, qty: e.target.value })} />
+                        <label className="form-label">PLAKA</label>
+                        <input className="form-input" placeholder="35 ABC 12" value={wbForm.plate} onChange={e => setWbForm({ ...wbForm, plate: e.target.value.toUpperCase() })} />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label className="form-label">FİRMA ADI</label>
+                    <div style={{ position: 'relative' }}>
+                        <Building2 size={20} style={{ position: 'absolute', left: 16, top: 18, color: '#999' }} />
+                        <input className="form-input" style={{ paddingLeft: 48 }} placeholder="Tedarikçi Firma" value={wbForm.company} onChange={e => setWbForm({ ...wbForm, company: e.target.value })} />
                     </div>
                 </div>
 
                 <div className="form-group">
                     <label className="form-label">MALZEME</label>
                     <select className="form-input" value={wbForm.material} onChange={e => setWbForm({ ...wbForm, material: e.target.value })}>
-                        {['Hazır Beton C30', 'Demir Ø12', 'İnce Kum', 'Çimento', 'Tuğla', 'Diğer'].map(m => (
+                        {['Hazır Beton C30', 'Demir Ø12', 'İnce Kum', 'Çimento', 'Tuğla', 'Agrega', 'Kalıp', 'Diğer'].map(m => (
                             <option key={m} value={m}>{m}</option>
                         ))}
                     </select>
                 </div>
 
-                <button className="btn-action" onClick={saveWaybill} disabled={loading}>
-                    {loading ? 'GÖNDERİLİYOR...' : 'KAYDET VE GÖNDER'}
+                <div className="stat-row">
+                    <div className="form-group">
+                        <label className="form-label">MİKTAR</label>
+                        <input type="number" className="form-input" placeholder="0" value={wbForm.qty} onChange={e => setWbForm({ ...wbForm, qty: e.target.value })} />
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label">BİRİM</label>
+                        <select className="form-input" value={wbForm.unit} onChange={e => setWbForm({ ...wbForm, unit: e.target.value })}>
+                            {['Ton', 'm³', 'Adet', 'Sefer', 'Kg', 'Torba'].map(u => (
+                                <option key={u} value={u}>{u}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label className="form-label">AÇIKLAMA (OPSİYONEL)</label>
+                    <textarea
+                        className="form-input"
+                        style={{ height: 80, resize: 'none', paddingTop: 12 }}
+                        placeholder="Notlar..."
+                        value={wbForm.notes}
+                        onChange={e => setWbForm({ ...wbForm, notes: e.target.value })}
+                    />
+                </div>
+
+                <button className="btn-action" onClick={saveWaybill} disabled={loading} style={{ marginBottom: 40 }}>
+                    {loading ? 'KAYDEDİLİYOR...' : 'KAYDET VE GÖNDER'}
                 </button>
             </div>
         </div>
