@@ -1,3 +1,4 @@
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -7,7 +8,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://34.76.183.133:3000',
+        target: 'http://localhost:3000', // Yerel Backend (En stabil)
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
@@ -15,21 +16,15 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    /* 
-    PWA Eklentisi klasör dizinindeki (') karakterinden dolayı build hatası veriyor.
-    Build sırasında geçici olarak devre dışı bırakıyorum ki .ipa derlemesini yapabilelim.
-    */
-    /* VitePWA({ 
+    VitePWA({
       registerType: 'autoUpdate',
-      devOptions: {
-        enabled: false
-      },
+      devOptions: { enabled: true },
       manifest: {
         name: 'YMH Saha',
         short_name: 'YMH Saha',
-        description: 'YMH Saha Operasyon Yönetimi',
+        description: 'YMH Saha Yönetim Sistemi',
         theme_color: '#FFD600',
-        background_color: '#121212',
+        background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
         icons: [
@@ -45,6 +40,6 @@ export default defineConfig({
           }
         ]
       }
-    }) */
+    })
   ]
 })
