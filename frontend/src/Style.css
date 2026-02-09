@@ -1,23 +1,21 @@
-/* === YMH SAHA: INDUSTRIAL FIELD OPS === */
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;600;800&display=swap');
+/* === YMH YAPI SAHA - FIELD SYSTEM v2.0 === */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Chakra+Petch:wght@500;700&display=swap');
 
 :root {
-    --bg-page: #FFFFFF;
-    --bg-surface: #F4F4F5;
+    --ymh-yellow: #FFD600;
+    --ymh-black: #000000;
+    --ymh-dark-gray: #1a1a1a;
+    --ymh-light-gray: #f4f4f5;
 
-    --safety-yellow: #FFD600;
-    /* İnşaat Sarısı */
-    --safety-orange: #FF5C00;
-    --industrial-black: #111111;
-    --concrete-gray: #71717A;
+    --bg-app: #FFFFFF;
+    --text-main: #000000;
+    --text-sec: #52525b;
 
-    --border-thick: 2px solid #E4E4E7;
-    --border-focus: 2px solid #000;
+    --border-std: 1px solid #e4e4e7;
+    --radius-m: 12px;
 
-    --radius: 8px;
-    /* Keskin köşeler, modern endüstriyel */
-    --safe-top: env(safe-area-inset-top, 20px);
-    --safe-bottom: env(safe-area-inset-bottom, 20px);
+    --safe-top: env(safe-area-inset-top, 24px);
+    --safe-bottom: env(safe-area-inset-bottom, 24px);
 }
 
 * {
@@ -28,15 +26,13 @@
 
 body {
     margin: 0;
-    background-color: var(--bg-page);
-    color: var(--industrial-black);
+    background-color: var(--bg-app);
+    color: var(--text-main);
     font-family: 'Inter', sans-serif;
-    font-size: 16px;
     height: 100vh;
     overflow: hidden;
 }
 
-/* === LAYOUT === */
 #root {
     height: 100%;
     display: flex;
@@ -45,205 +41,192 @@ body {
     padding-bottom: var(--safe-bottom);
 }
 
-/* === HEADER (CLEAR & WHITE) === */
-.field-header {
+/* === HEADER: WHITE & CLEAN === */
+.header-bar {
     background: #fff;
-    padding: 16px 20px;
-    border-bottom: 4px solid var(--safety-yellow);
-    /* Güçlü marka vurgusu */
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 2px solid var(--ymh-yellow);
+    flex-shrink: 0;
 }
 
-.brand-img {
-    height: 32px;
+.brand-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    height: 40px;
+    /* Logo yeterince büyük */
     width: auto;
     object-fit: contain;
 }
 
-.project-tag {
-    background: var(--industrial-black);
-    color: var(--safety-yellow);
-    padding: 4px 12px;
+.brand-text {
     font-family: 'Chakra Petch', sans-serif;
     font-weight: 700;
-    font-size: 14px;
-    border-radius: 4px;
-    text-transform: uppercase;
-}
-
-/* === CARDS (RUGGED) === */
-.field-card {
-    background: var(--bg-surface);
-    border: 2px solid #E4E4E7;
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.field-card.active {
-    border-color: var(--industrial-black);
-    background: #fff;
-    box-shadow: 4px 4px 0 #000;
-    /* Retro shadowing for clickability */
-}
-
-/* === BIG BUTTONS (TOUCH FRIENDLY) === */
-.btn-field {
-    width: 100%;
-    height: 64px;
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'Chakra Petch', sans-serif;
     font-size: 18px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+/* === CONTENT AREA === */
+.content-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #FAFAFA;
+}
+
+/* === CARDS === */
+.info-card {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: var(--radius-m);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.info-card.active {
+    border: 2px solid var(--ymh-yellow);
+    background: #fff;
+}
+
+/* === BUTTONS (HIGH VISIBILITY) === */
+.btn-action {
+    width: 100%;
+    height: 60px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 800;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--ymh-yellow);
+    color: #000;
+    box-shadow: 0 4px 0 #E5C300;
+    /* 3D effect */
     transition: transform 0.1s;
 }
 
-.btn-primary {
-    background: var(--safety-yellow);
-    color: #000;
-    border: 2px solid #000;
-    box-shadow: 4px 4px 0 #000;
-}
-
-.btn-primary:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 #000;
+.btn-action:active {
+    transform: translateY(4px);
+    box-shadow: none;
 }
 
 .btn-secondary {
     background: #fff;
     color: #000;
-    border: 2px solid #E4E4E7;
+    border: 2px solid #e4e4e7;
+    box-shadow: 0 4px 0 #e4e4e7;
 }
 
-/* === INPUTS (HIGH VISIBILITY) === */
-.input-label {
+/* === FORM INPUTS === */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
     display: block;
-    font-family: 'Chakra Petch', sans-serif;
+    font-size: 12px;
     font-weight: 700;
-    font-size: 13px;
-    text-transform: uppercase;
+    color: var(--text-sec);
     margin-bottom: 8px;
-    color: var(--concrete-gray);
+    text-transform: uppercase;
 }
 
-.field-input {
+.form-input {
     width: 100%;
     height: 56px;
+    border: 2px solid #e4e4e7;
     background: #fff;
-    border: 2px solid #E4E4E7;
-    border-radius: var(--radius);
+    border-radius: 8px;
     padding: 0 16px;
     font-size: 18px;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
-    color: #000;
 }
 
-.field-input:focus {
-    border-color: var(--safety-yellow);
-    outline: 2px solid #000;
+.form-input:focus {
+    border-color: var(--ymh-yellow);
 }
 
-/* === STATS (BIG NUMBERS) === */
-.stat-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
-.stat-box {
-    background: #fff;
-    border: 2px solid #E4E4E7;
-    padding: 16px;
-    border-radius: var(--radius);
-    text-align: center;
-}
-
-.stat-num {
-    font-size: 36px;
-    font-family: 'Chakra Petch', sans-serif;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.stat-lbl {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--concrete-gray);
-    text-transform: uppercase;
-    margin-top: 4px;
-}
-
-/* === PHOTO CAPTURE === */
-.camera-box {
-    background: #000;
-    border-radius: var(--radius);
-    height: 200px;
+/* === CAMERA BOX === */
+.camera-trigger {
+    background: #f4f4f5;
+    border: 2px dashed #d4d4d8;
+    border-radius: 12px;
+    height: 160px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: var(--text-sec);
     cursor: pointer;
     margin-bottom: 24px;
-    border: 2px dashed var(--safety-yellow);
 }
 
-.camera-box.has-img {
-    background: #fff;
-    border: 2px solid var(--safety-yellow);
-    color: #000;
+.camera-trigger.filled {
+    background: #ecfdf5;
+    border-color: #10b981;
+    color: #047857;
 }
 
-/* === LIST === */
-.tx-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-}
-
-.tx-item {
-    background: #fff;
-    border-bottom: 1px solid #E4E4E7;
-    padding: 16px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.tx-plate {
-    font-weight: 800;
-    font-size: 16px;
-    font-family: 'Chakra Petch';
-}
-
-.tx-detail {
-    font-size: 13px;
-    color: var(--concrete-gray);
-}
-
-/* === OVERLAYS === */
-.full-overlay {
+/* === MODAL OVERLAY === */
+.modal-layer {
     position: fixed;
     inset: 0;
     background: #fff;
-    z-index: 100;
+    z-index: 99;
     display: flex;
     flex-direction: column;
-    padding: var(--safe-top) 20px var(--safe-bottom);
+}
+
+.modal-header {
+    height: 70px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e4e4e7;
+    background: #f9fafb;
+}
+
+/* === STATS === */
+.stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.stat-val {
+    font-size: 28px;
+    font-weight: 800;
+    color: #000;
+    line-height: 1.2;
+}
+
+.stat-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: #71717a;
+    text-transform: uppercase;
 }
