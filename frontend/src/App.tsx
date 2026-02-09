@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 /* --- AYARLAR --- */
-const API_URL = 'http://34.76.183.133:3000'; // Canlı Sunucu
+const API_URL = 'http://localhost:3000'; // Yerel Geliştirme Sunucusu
 
 /* --- TİPLER --- */
 interface Project {
