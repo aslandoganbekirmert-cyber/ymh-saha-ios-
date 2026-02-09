@@ -1,29 +1,23 @@
-/* === YMH SAHA PREMIUM V1.0 === */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+/* === YMH SAHA: INDUSTRIAL FIELD OPS === */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;600;800&display=swap');
 
 :root {
-    /* --- PALETTE --- */
-    --bg-void: #0A0A0A;
-    /* Derin Siyah */
-    --bg-card: #18181B;
-    /* Kömür Gri */
-    --bg-elevated: #27272A;
-    /* Açık Kömür */
+    --bg-page: #FFFFFF;
+    --bg-surface: #F4F4F5;
 
-    --gold: #FFD700;
-    /* YMH Altın */
-    --gold-dim: rgba(255, 215, 0, 0.15);
+    --safety-yellow: #FFD600;
+    /* İnşaat Sarısı */
+    --safety-orange: #FF5C00;
+    --industrial-black: #111111;
+    --concrete-gray: #71717A;
 
-    --text-pri: #FFFFFF;
-    --text-sec: #A1A1AA;
+    --border-thick: 2px solid #E4E4E7;
+    --border-focus: 2px solid #000;
 
-    --border: rgba(255, 255, 255, 0.08);
-
-    --radius-l: 16px;
-    --radius-s: 8px;
-
-    --safe-top: env(safe-area-inset-top, 24px);
-    --safe-bottom: env(safe-area-inset-bottom, 24px);
+    --radius: 8px;
+    /* Keskin köşeler, modern endüstriyel */
+    --safe-top: env(safe-area-inset-top, 20px);
+    --safe-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 * {
@@ -34,151 +28,138 @@
 
 body {
     margin: 0;
-    background-color: var(--bg-void);
-    color: var(--text-pri);
-    font-family: 'Manrope', -apple-system, sans-serif;
-    font-size: 15px;
-    overflow-x: hidden;
+    background-color: var(--bg-page);
+    color: var(--industrial-black);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    height: 100vh;
+    overflow: hidden;
 }
 
 /* === LAYOUT === */
-.app-shell {
-    min-height: 100vh;
+#root {
+    height: 100%;
     display: flex;
     flex-direction: column;
     padding-top: var(--safe-top);
     padding-bottom: var(--safe-bottom);
 }
 
-/* === HEADER & BRAND === */
-.brand-header {
-    background: var(--bg-void);
-    padding: 16px 24px;
+/* === HEADER (CLEAR & WHITE) === */
+.field-header {
+    background: #fff;
+    padding: 16px 20px;
+    border-bottom: 4px solid var(--safety-yellow);
+    /* Güçlü marka vurgusu */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    border-bottom: 1px solid var(--border);
 }
 
-.brand-logo-img {
+.brand-img {
     height: 32px;
     width: auto;
-    display: block;
+    object-fit: contain;
 }
 
-.brand-title {
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: #fff;
-    margin-left: 12px;
-}
-
-/* === CARDS (PREMIUM) === */
-.premium-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-l);
-    padding: 20px;
-    margin-bottom: 16px;
-    transition: transform 0.2s, background 0.2s;
-}
-
-.premium-card:active {
-    background: var(--bg-elevated);
-    transform: scale(0.99);
-}
-
-.card-title {
-    font-size: 16px;
+.project-tag {
+    background: var(--industrial-black);
+    color: var(--safety-yellow);
+    padding: 4px 12px;
+    font-family: 'Chakra Petch', sans-serif;
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 4px;
-}
-
-.card-sub {
-    font-size: 13px;
-    color: var(--text-sec);
-}
-
-/* === INPUTS & FORMS === */
-.input-group {
-    margin-bottom: 20px;
-}
-
-.input-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-sec);
-    margin-bottom: 8px;
+    font-size: 14px;
+    border-radius: 4px;
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
-.premium-input {
+/* === CARDS (RUGGED) === */
+.field-card {
+    background: var(--bg-surface);
+    border: 2px solid #E4E4E7;
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.field-card.active {
+    border-color: var(--industrial-black);
+    background: #fff;
+    box-shadow: 4px 4px 0 #000;
+    /* Retro shadowing for clickability */
+}
+
+/* === BIG BUTTONS (TOUCH FRIENDLY) === */
+.btn-field {
     width: 100%;
-    height: 56px;
-    background: var(--bg-void);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-s);
-    padding: 0 16px;
-    font-size: 16px;
-    font-family: inherit;
-    color: #fff;
-    transition: 0.2s;
-}
-
-.premium-input:focus {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 1px var(--gold);
-}
-
-/* === BUTTONS (CTA) === */
-.btn-gold {
-    width: 100%;
-    height: 56px;
-    background: var(--gold);
-    color: #000;
+    height: 64px;
     border: none;
-    border-radius: var(--radius-s);
-    font-size: 16px;
+    border-radius: var(--radius);
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 18px;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+    transition: transform 0.1s;
 }
 
-.btn-gold:active {
-    transform: translateY(2px);
-    box-shadow: none;
-    opacity: 0.9;
+.btn-primary {
+    background: var(--safety-yellow);
+    color: #000;
+    border: 2px solid #000;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #000;
 }
 
 .btn-secondary {
-    width: 100%;
-    height: 56px;
-    background: var(--bg-elevated);
-    color: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-s);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    background: #fff;
+    color: #000;
+    border: 2px solid #E4E4E7;
 }
 
-/* === STATS === */
-.stat-grid {
+/* === INPUTS (HIGH VISIBILITY) === */
+.input-label {
+    display: block;
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--concrete-gray);
+}
+
+.field-input {
+    width: 100%;
+    height: 56px;
+    background: #fff;
+    border: 2px solid #E4E4E7;
+    border-radius: var(--radius);
+    padding: 0 16px;
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    color: #000;
+}
+
+.field-input:focus {
+    border-color: var(--safety-yellow);
+    outline: 2px solid #000;
+}
+
+/* === STATS (BIG NUMBERS) === */
+.stat-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
@@ -186,130 +167,83 @@ body {
 }
 
 .stat-box {
-    background: var(--bg-card);
+    background: #fff;
+    border: 2px solid #E4E4E7;
     padding: 16px;
-    border-radius: var(--radius-l);
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 110px;
+    border-radius: var(--radius);
+    text-align: center;
 }
 
-.stat-val {
-    font-size: 32px;
+.stat-num {
+    font-size: 36px;
+    font-family: 'Chakra Petch', sans-serif;
     font-weight: 700;
-    color: #fff;
-    margin-top: auto;
+    line-height: 1;
 }
 
 .stat-lbl {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--text-sec);
+    color: var(--concrete-gray);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    margin-top: 4px;
 }
 
-/* === NAV === */
-.nav-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(24, 24, 27, 0.95);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 0 calc(var(--safe-bottom) + 8px);
-    z-index: 100;
-}
-
-.nav-item {
+/* === PHOTO CAPTURE === */
+.camera-box {
+    background: #000;
+    border-radius: var(--radius);
+    height: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    color: var(--text-sec);
-    font-size: 10px;
-    font-weight: 600;
+    justify-content: center;
+    color: #fff;
     cursor: pointer;
-    width: 64px;
+    margin-bottom: 24px;
+    border: 2px dashed var(--safety-yellow);
 }
 
-.nav-item.active {
-    color: var(--gold);
+.camera-box.has-img {
+    background: #fff;
+    border: 2px solid var(--safety-yellow);
+    color: #000;
 }
 
-.nav-fab {
-    width: 56px;
-    height: 56px;
-    background: var(--gold);
-    border-radius: 28px;
+/* === LIST === */
+.tx-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.tx-item {
+    background: #fff;
+    border-bottom: 1px solid #E4E4E7;
+    padding: 16px 0;
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: #000;
-    transform: translateY(-24px);
-    box-shadow: 0 8px 24px -4px rgba(255, 215, 0, 0.4);
-    border: 4px solid var(--bg-void);
-    /* Cutout */
+    justify-content: space-between;
 }
 
-/* === MODAL SHEET === */
-.sheet-backdrop {
+.tx-plate {
+    font-weight: 800;
+    font-size: 16px;
+    font-family: 'Chakra Petch';
+}
+
+.tx-detail {
+    font-size: 13px;
+    color: var(--concrete-gray);
+}
+
+/* === OVERLAYS === */
+.full-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(4px);
-    z-index: 200;
+    background: #fff;
+    z-index: 100;
     display: flex;
     flex-direction: column;
-}
-
-.sheet-content {
-    margin-top: auto;
-    background: var(--bg-card);
-    border-top: 1px solid var(--border);
-    border-top-left-radius: 24px;
-    border-top-right-radius: 24px;
-    padding: 24px 24px calc(var(--safe-bottom) + 24px);
-    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(100%);
-    }
-
-    to {
-        transform: translateY(0);
-    }
-}
-
-/* === UTILS === */
-.ph-img {
-    width: 100%;
-    height: 140px;
-    background: var(--bg-void);
-    border: 1px dashed var(--border);
-    border-radius: var(--radius-s);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-sec);
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 24px;
-    cursor: pointer;
-}
-
-.ph-img.has-img {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: var(--gold-dim);
+    padding: var(--safe-top) 20px var(--safe-bottom);
 }
