@@ -25,7 +25,9 @@ import {
     PenTool
 } from 'lucide-react';
 
-const API_URL = '/api/v1';
+// DİKKAT: Mobil uygulamada (IPA/APK) buraya TAM IP ADRESİ yazılmalıdır.
+// Bilgisayarınızın IP adresi: 172.20.10.3 (Loglardan alındı)
+const API_URL = 'http://172.20.10.3:3000/api/v1';
 
 export default function App() {
     /* --- STATE --- */

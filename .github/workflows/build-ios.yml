@@ -1,88 +1,36 @@
-name: Build iOS IPA
+
+name: Build iOS IPA 🍏
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch: # Manuel tetikleme için
 
 jobs:
-  build-ios:
-    runs-on: macos-latest
-
-    permissions:
-      contents: read
-      packages: write
-
+  build:
+    name: EAS Build
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
+      - name: 🏗 Setup Repo
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js v22
-        uses: actions/setup-node@v4
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 18.x
+          cache: npm
 
-      - name: Install Dependencies
-        working-directory: ./frontend
-        run: |
-          npm install --legacy-peer-deps
-          npm install @capacitor/core @capacitor/cli @capacitor/ios
-
-      - name: Build Web App
-        working-directory: ./frontend
-        run: |
-          npm run build
-
-      - name: Recreate iOS Platform
-        working-directory: ./frontend
-        run: |
-          rm -rf ios
-          npx cap add ios
-          npx cap sync ios
-
-      - name: Build IPA (Unsigned Build Method)
-        working-directory: ./frontend
-        run: |
-          # Klasorleri kontrol et
-          PROJECT_PATH=$(find . -name "App.xcodeproj" | head -n 1)
-          PROJECT_DIR=$(dirname "$PROJECT_PATH")
-          
-          echo "Proje Klasoru: $PROJECT_DIR"
-          cd "$PROJECT_DIR"
-
-          # xcodebuild Komutu (BUILD modunda, Archive degil)
-          # build/Release-iphoneos/App.app olusturur
-          
-          xcodebuild -project App.xcodeproj \
-            -scheme App \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath build_output \
-            clean build \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
-
-      - name: Package Payload (IPA)
-        working-directory: ./frontend
-        run: |
-          # App.app dosyasini bul (.app uzantili klasor)
-          APP_PATH=$(find . -name "App.app" | grep "Release-iphoneos" | head -n 1)
-          
-          if [ -z "$APP_PATH" ]; then
-            echo "App.app BULUNAMADI! Derleme hatali olabilir."
-            find . -name "*.app"
-            exit 1
-          fi
-          
-          echo "App Bulundu: $APP_PATH"
-          
-          mkdir -p Payload
-          cp -r "$APP_PATH" Payload/
-          zip -r App.ipa Payload
-
-      - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v4
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v2
         with:
-          name: ymh-saha-ios-unsigned
-          path: frontend/App.ipa
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install Dependencies
+        run: cd mobile && npm install
+
+      - name: 🚀 Build iOS IPA
+        # profil_imzali profilini kullanarak build alır.
+        # Sertifikalarınız Expo sunucularında kayıtlı olmalıdır (ilk sefer lokalden yapmanız önerilir).
+        run: cd mobile && eas build --platform ios --profile profil_imzali --non-interactive --no-wait

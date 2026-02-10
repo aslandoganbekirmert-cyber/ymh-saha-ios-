@@ -18,7 +18,10 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Proje konumunu harita üzerinde işaretlemek için konumunuza ihtiyacımız var.",
         "NSCameraUsageDescription": "İrsaliye ve fiş fotoğraflarını çekmek için kameranıza ihtiyacımız var.",
-        "NSPhotoLibraryUsageDescription": "Galeriden fotoğraf seçmek için izniniz gerekiyor."
+        "NSPhotoLibraryUsageDescription": "Galeriden fotoğraf seçmek için izniniz gerekiyor.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       }
     },
     "android": {
