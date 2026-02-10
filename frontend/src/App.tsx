@@ -36,8 +36,13 @@ export default function App() {
     const [activeProject, setActiveProject] = useState<any>(null);
     const [transactions, setTransactions] = useState<any[]>([]);
 
-    // Form States
+    // New Site Form
     const [newSiteName, setNewSiteName] = useState('');
+    const [newSiteLocation, setNewSiteLocation] = useState(''); // Ekranda görünen adres
+    const [newSiteCoords, setNewSiteCoords] = useState<{ lat: number, lng: number } | null>(null); // Arka plandaki koordinat
+    const [fetchedAddress, setFetchedAddress] = useState<{ city: string, district: string }>({ city: 'İzmir', district: 'Merkez' });
+
+    // Transaction Form
     const [wbForm, setWbForm] = useState({
         plate: '', company: '', invoice_no: '', material: 'HAFRİYAT',
         qty: '', unit: 'Sefer', notes: '', imgBlob: null as Blob | null, imgPreview: ''
@@ -50,6 +55,45 @@ export default function App() {
 
     /* --- INIT --- */
     useEffect(() => { loadProjects(); }, []);
+
+    // Konum ve Adres Çekme
+    useEffect(() => {
+        if (view === 'new-site') {
+            setNewSiteLocation('Adres getiriliyor...');
+            setNewSiteCoords(null);
+
+            Geolocation.getCurrentPosition({ timeout: 10000, enableHighAccuracy: true })
+                .then(async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    setNewSiteCoords({ lat, lng });
+
+                    // Reverse Geocoding (OpenStreetMap)
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            // Adresi formatla
+                            // address: { road, suburb, city_district, city, ... }
+                            const addr = data.address;
+                            const district = addr.suburb || addr.city_district || addr.town || 'Merkez';
+                            const city = addr.province || addr.city || 'İzmir';
+
+                            setFetchedAddress({ city, district });
+                            setNewSiteLocation(data.display_name || 'Bilinmeyen Adres');
+                        } else {
+                            setNewSiteLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                        }
+                    } catch (err) {
+                        // İnternet yoksa veya API hatası varsa koordinatı göster
+                        setNewSiteLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                    }
+                })
+                .catch((err) => {
+                    setNewSiteLocation('Konum alınamadı (Manuel giriniz)');
+                });
+        }
+    }, [view]);
 
     const loadProjects = async () => {
         setLoading(true);
@@ -69,23 +113,17 @@ export default function App() {
     };
 
     const createSite = async () => {
-        if (!newSiteName) return showToast('Saha Adı Giriniz', 'error');
+        if (!newSiteName) return showToast('Proje Adı Giriniz', 'error');
         setLoading(true);
         try {
-            let lat = 0, lng = 0;
-            try {
-                const pos = await Geolocation.getCurrentPosition();
-                lat = pos.coords.latitude; lng = pos.coords.longitude;
-            } catch { }
-
             const payload = {
                 name: newSiteName,
-                code: `SAHA-${Date.now().toString().slice(-4)}`,
-                city: 'İzmir',
-                district: 'Merkez',
+                code: `PROJE-${Date.now().toString().slice(-4)}`,
+                city: fetchedAddress.city,
+                district: fetchedAddress.district,
                 status: 'ACTIVE',
-                gps_lat: lat,
-                gps_lng: lng
+                gps_lat: newSiteCoords?.lat || 0,
+                gps_lng: newSiteCoords?.lng || 0
             };
 
             const res = await fetch(`${API_URL}/projects`, {
@@ -99,7 +137,7 @@ export default function App() {
                 setProjects([...projects, newP]);
                 setView('auth');
                 setNewSiteName('');
-                showToast('Saha Oluşturuldu');
+                showToast('Proje Oluşturuldu');
                 openDashboard(newP);
             } else {
                 showToast('Oluşturulamadı', 'error');
@@ -174,12 +212,12 @@ export default function App() {
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
                 <img src="/logo.png" style={{ height: 48, marginBottom: 16 }} />
                 <div style={{ fontSize: 20, fontWeight: 700 }}>YMH Operasyon</div>
-                <div style={{ color: '#71717A', fontSize: 13 }}>Devam etmek için saha seçin</div>
+                <div style={{ color: '#71717A', fontSize: 13 }}>Devam etmek için proje seçin</div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {loading && <div style={{ textAlign: 'center', color: '#999' }}><Loader2 className="animate-spin" /> Yükleniyor...</div>}
-                {!loading && projects.length === 0 && <div style={{ textAlign: 'center', color: '#A1A1AA', padding: 20 }}>Henüz kayıtlı saha yok.</div>}
+                {!loading && projects.length === 0 && <div style={{ textAlign: 'center', color: '#A1A1AA', padding: 20 }}>Henüz kayıtlı proje yok.</div>}
 
                 {projects.map(p => (
                     <div key={p.id} onClick={() => openDashboard(p)}
@@ -206,7 +244,7 @@ export default function App() {
                         marginTop: 12, color: '#71717A', fontWeight: 600
                     }}>
                     <Plus size={20} />
-                    Yeni Saha Ekle
+                    Yeni Proje Ekle
                 </div>
             </div>
 
@@ -219,23 +257,41 @@ export default function App() {
         </div>
     );
 
-    // 1.5 YENI SAHA
+    // 1.5 YENI PROJE
     if (view === 'new-site') return (
         <div className="modal-overlay">
             <div className="modal-header">
                 <div onClick={() => setView('auth')} style={{ padding: 4 }}><ArrowLeft size={24} /></div>
-                <div className="modal-title">Yeni Saha</div>
+                <div className="modal-title">Yeni Proje</div>
             </div>
             <div className="form-scroll" style={{ justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
                 <div className="form-section">
                     <div className="input-group">
-                        <label className="input-label">SAHA ADI</label>
+                        <label className="input-label">PROJE ADI</label>
                         <input className="modern-input" placeholder="ÖRN: MERKEZ DEPO" autoFocus
                             value={newSiteName} onChange={(e) => setNewSiteName(e.target.value)}
                         />
                     </div>
-                    <div style={{ fontSize: 13, color: '#71717A', display: 'flex', gap: 8 }}>
-                        <MapPin size={16} /> Konum otomatik eklenecektir.
+                    <div className="input-group">
+                        <label className="input-label">PROJE ADRESİ</label>
+                        <div style={{ position: 'relative' }}>
+                            <textarea className="modern-input"
+                                value={newSiteLocation}
+                                onChange={(e) => setNewSiteLocation(e.target.value)}
+                                placeholder="Adres alınıyor..."
+                                style={{ height: 80, resize: 'none', paddingTop: 12 }}
+                            />
+                            <div style={{ position: 'absolute', right: 12, top: 12 }}>
+                                {newSiteLocation === 'Konum Alınıyor...' || newSiteLocation === 'Adres getiriliyor...' ? (
+                                    <Loader2 size={20} className="animate-spin" />
+                                ) : (
+                                    newSiteLocation.includes('HATA') ? <AlertTriangle size={20} color="#EF4444" /> : <MapPin size={20} color="#10B981" />
+                                )}
+                            </div>
+                        </div>
+                        <div style={{ fontSize: 11, color: '#A1A1AA', marginTop: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            {/* Bilgi notu */}
+                        </div>
                     </div>
                 </div>
                 <button className="btn-primary" onClick={createSite} disabled={loading}>
