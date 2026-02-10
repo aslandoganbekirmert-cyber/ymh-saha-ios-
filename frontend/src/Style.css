@@ -77,8 +77,8 @@ body {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
-    padding-bottom: calc(80px + var(--safe-bottom));
-    /* FAB için boşluk */
+    padding-bottom: calc(88px + var(--safe-bottom));
+    /* FAB (64+24) için */
 }
 
 .stats-container {
@@ -184,7 +184,9 @@ body {
 .fab-btn {
     position: absolute;
     bottom: calc(24px + var(--safe-bottom));
-    right: 24px;
+    /* ORTALA */
+    left: 50%;
+    transform: translateX(-50%);
     width: 64px;
     height: 64px;
     background: var(--primary);
@@ -199,7 +201,7 @@ body {
 }
 
 .fab-btn:active {
-    transform: scale(0.95);
+    transform: translateX(-50%) scale(0.95);
 }
 
 /* --- MODAL --- */
@@ -270,7 +272,8 @@ body {
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
     border-radius: 12px;
-    padding: 0 16px;
+    padding: 12px 16px;
+    /* Textarea için padding fix */
     font-size: 16px;
     font-weight: 500;
     font-family: inherit;
@@ -392,4 +395,76 @@ body {
         transform: translate(-50%, 0);
         opacity: 1;
     }
+}
+
+/* --- ACTION SHEET ANIMATION & STYLES --- */
+.sheet-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.sheet-content {
+    background: #fff;
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+    padding-bottom: calc(24px + var(--safe-bottom));
+    animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpSheet {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.sheet-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #F8FAFC;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid #E2E8F0;
+}
+
+.sheet-item:active {
+    background: #F1F5F9;
+    transform: scale(0.98);
+}
+
+.sheet-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
