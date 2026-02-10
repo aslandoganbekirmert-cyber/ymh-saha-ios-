@@ -20,7 +20,9 @@ import {
     FileText,
     ChevronRight,
     Search,
-    Loader2
+    Loader2,
+    ScanLine,
+    PenTool
 } from 'lucide-react';
 
 const API_URL = '/api/v1';
@@ -30,6 +32,7 @@ export default function App() {
     const [view, setView] = useState<'auth' | 'dashboard' | 'form' | 'new-site'>('auth');
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+    const [showActionSheet, setShowActionSheet] = useState(false); // Yeni Menü State
 
     // Data
     const [projects, setProjects] = useState<any[]>([]);
@@ -38,8 +41,8 @@ export default function App() {
 
     // New Site Form
     const [newSiteName, setNewSiteName] = useState('');
-    const [newSiteLocation, setNewSiteLocation] = useState(''); // Ekranda görünen adres
-    const [newSiteCoords, setNewSiteCoords] = useState<{ lat: number, lng: number } | null>(null); // Arka plandaki koordinat
+    const [newSiteLocation, setNewSiteLocation] = useState('');
+    const [newSiteCoords, setNewSiteCoords] = useState<{ lat: number, lng: number } | null>(null);
     const [fetchedAddress, setFetchedAddress] = useState<{ city: string, district: string }>({ city: 'İzmir', district: 'Merkez' });
 
     // Transaction Form
@@ -68,24 +71,19 @@ export default function App() {
                     const lng = pos.coords.longitude;
                     setNewSiteCoords({ lat, lng });
 
-                    // Reverse Geocoding (OpenStreetMap)
                     try {
                         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
                         if (res.ok) {
                             const data = await res.json();
-                            // Adresi formatla
-                            // address: { road, suburb, city_district, city, ... }
                             const addr = data.address;
                             const district = addr.suburb || addr.city_district || addr.town || 'Merkez';
                             const city = addr.province || addr.city || 'İzmir';
-
                             setFetchedAddress({ city, district });
                             setNewSiteLocation(data.display_name || 'Bilinmeyen Adres');
                         } else {
                             setNewSiteLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
                         }
                     } catch (err) {
-                        // İnternet yoksa veya API hatası varsa koordinatı göster
                         setNewSiteLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
                     }
                 })
@@ -156,7 +154,8 @@ export default function App() {
         } catch { }
     };
 
-    const takePhoto = async () => {
+    // Form içinden veya Menüden çağrılabilir
+    const takePhoto = async (openFormAfter = false) => {
         try {
             const image = await Camera.getPhoto({
                 quality: 60, allowEditing: false, resultType: CameraResultType.Uri,
@@ -164,7 +163,15 @@ export default function App() {
             });
             const response = await fetch(image.webPath!);
             const blob = await response.blob();
+
+            // State güncelle
             setWbForm(prev => ({ ...prev, imgBlob: blob, imgPreview: image.webPath! }));
+
+            // Eğer menüden çağrıldıysa formu aç
+            if (openFormAfter) {
+                setShowActionSheet(false);
+                setView('form');
+            }
         } catch { }
     };
 
@@ -194,6 +201,7 @@ export default function App() {
                 const newTx = await res.json();
                 setTransactions([newTx, ...transactions]);
                 setView('dashboard');
+                // Formu ve Resmi Temizle
                 setWbForm({
                     plate: '', company: '', invoice_no: '', material: 'HAFRİYAT',
                     qty: '', unit: 'Sefer', notes: '', imgBlob: null, imgPreview: ''
@@ -285,7 +293,7 @@ export default function App() {
                                 {newSiteLocation === 'Konum Alınıyor...' || newSiteLocation === 'Adres getiriliyor...' ? (
                                     <Loader2 size={20} className="animate-spin" />
                                 ) : (
-                                    newSiteLocation.includes('HATA') ? <AlertTriangle size={20} color="#EF4444" /> : <MapPin size={20} color="#10B981" />
+                                    newSiteLocation.includes('Alınamadı') ? <AlertTriangle size={20} color="#EF4444" /> : <MapPin size={20} color="#10B981" />
                                 )}
                             </div>
                         </div>
@@ -368,10 +376,43 @@ export default function App() {
                     </div>
                 </div>
 
-                {/* FAB */}
-                <div className="fab-btn" onClick={() => setView('form')}>
+                {/* FAB (Orta) */}
+                <div className="fab-btn" onClick={() => setShowActionSheet(true)}>
                     <Plus size={24} />
                 </div>
+
+                {/* ACTION SHEET OVERLAY */}
+                {showActionSheet && (
+                    <div className="sheet-overlay" onClick={() => setShowActionSheet(false)}>
+                        <div className="sheet-content" onClick={e => e.stopPropagation()}>
+                            <div className="sheet-item" onClick={() => takePhoto(true)}>
+                                <div className="sheet-icon-box" style={{ background: '#FEF3C7' }}>
+                                    <ScanLine size={24} color="#D97706" />
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: 16 }}>Fiş Tara / OCR</div>
+                                    <div style={{ fontSize: 12, color: '#71717A' }}>Kamera ile otomatik okuma</div>
+                                </div>
+                                <ChevronRight size={20} color="#D4D4D8" style={{ marginLeft: 'auto' }} />
+                            </div>
+
+                            <div className="sheet-item" onClick={() => { setShowActionSheet(false); setView('form'); }}>
+                                <div className="sheet-icon-box" style={{ background: '#F4F4F5' }}>
+                                    <PenTool size={24} color="#52525B" />
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: 16 }}>Manuel Giriş</div>
+                                    <div style={{ fontSize: 12, color: '#71717A' }}>Elle veri doldurma formu</div>
+                                </div>
+                                <ChevronRight size={20} color="#D4D4D8" style={{ marginLeft: 'auto' }} />
+                            </div>
+
+                            <div style={{ textAlign: 'center', padding: 12, color: '#EF4444', fontWeight: 600, cursor: 'pointer' }} onClick={() => setShowActionSheet(false)}>
+                                Vazgeç
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -385,8 +426,8 @@ export default function App() {
             </div>
 
             <div className="form-scroll">
-                {/* Camera Widget */}
-                <div className={`camera-widget ${wbForm.imgPreview ? 'active' : ''}`} onClick={wbForm.imgPreview ? undefined : takePhoto}>
+                {/* Camera Widget (Preview) */}
+                <div className={`camera-widget ${wbForm.imgPreview ? 'active' : ''}`} onClick={wbForm.imgPreview ? undefined : () => takePhoto(false)}>
                     {wbForm.imgPreview ? (
                         <>
                             <img src={wbForm.imgPreview} />
@@ -399,8 +440,8 @@ export default function App() {
                             <div style={{ width: 48, height: 48, borderRadius: 24, background: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
                                 <CameraIcon size={24} color="#64748B" />
                             </div>
-                            <div style={{ fontWeight: 600, fontSize: 14 }}>Fiş Fotoğrafı Çek</div>
-                            <div style={{ fontSize: 12, color: '#94A3B8' }}>OCR ile otomatik okunur</div>
+                            <div style={{ fontWeight: 600, fontSize: 14 }}>Fiş Fotoğrafı Ekle</div>
+                            <div style={{ fontSize: 12, color: '#94A3B8' }}>(Opsiyonel)</div>
                         </>
                     )}
                 </div>
