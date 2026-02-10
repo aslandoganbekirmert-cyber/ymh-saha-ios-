@@ -214,45 +214,51 @@ export default function App() {
 
     /* --- VIEWS --- */
 
-    // 1. SAHA LISTESI
+    // 1. SAHA LISTESI (REDESIGNED FOR PREMIUM LOOK)
     if (view === 'auth') return (
-        <div id="root" style={{ background: '#fff', padding: 24, justifyContent: 'center' }}>
-            <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                <img src="/logo.png" style={{ height: 48, marginBottom: 16 }} />
-                <div style={{ fontSize: 20, fontWeight: 700 }}>YMH Operasyon</div>
-                <div style={{ color: '#71717A', fontSize: 13 }}>Devam etmek için proje seçin</div>
+        <div id="root" style={{ background: '#fff', padding: 32, justifyContent: 'center' }}>
+            <div style={{ textAlign: 'center', marginBottom: 48, marginTop: 40 }}>
+                {/* LOGO BOYUTU ARTTIRILDI */}
+                <img src="/logo.png" style={{ height: 120, width: 'auto', marginBottom: 24, objectFit: 'contain' }} />
+
+                <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-1px', marginBottom: 8 }}>YMH Operasyon</div>
+                <div style={{ color: '#71717A', fontSize: 15, lineHeight: 1.5 }}>
+                    Devam etmek için bir proje seçin<br />veya yeni bir operasyon başlatın.
+                </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {loading && <div style={{ textAlign: 'center', color: '#999' }}><Loader2 className="animate-spin" /> Yükleniyor...</div>}
-                {!loading && projects.length === 0 && <div style={{ textAlign: 'center', color: '#A1A1AA', padding: 20 }}>Henüz kayıtlı proje yok.</div>}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {loading && <div style={{ textAlign: 'center', color: '#999', padding: 20 }}><Loader2 className="animate-spin" size={32} /></div>}
 
+                {/* PROJE LISTESI */}
                 {projects.map(p => (
                     <div key={p.id} onClick={() => openDashboard(p)}
                         style={{
-                            padding: 16, borderRadius: 16, border: '1px solid #E2E8F0',
+                            padding: 20, borderRadius: 20, border: '1px solid #E2E8F0',
                             display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.03)', background: '#fff'
                         }}>
-                        <div style={{ width: 40, height: 40, background: '#F4F4F5', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Building2 size={20} color="#52525B" />
+                        <div style={{ width: 48, height: 48, background: '#F4F4F5', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Building2 size={24} color="#18181B" />
                         </div>
                         <div>
-                            <div style={{ fontWeight: 600 }}>{p.name}</div>
-                            <div style={{ fontSize: 12, color: '#A1A1AA' }}>{p.city}/{p.district}</div>
+                            <div style={{ fontWeight: 700, fontSize: 16 }}>{p.name}</div>
+                            <div style={{ fontSize: 13, color: '#A1A1AA' }}>{p.city}/{p.district}</div>
                         </div>
-                        <ChevronRight size={16} color="#D4D4D8" style={{ marginLeft: 'auto' }} />
+                        <ChevronRight size={20} color="#D4D4D8" style={{ marginLeft: 'auto' }} />
                     </div>
                 ))}
 
+                {/* YENI PROJE BUTONU (PREMIUM STYLE) - KESİK ÇİZGİ YERİNE DOLU BUTON */}
                 <div onClick={() => setView('new-site')}
                     style={{
-                        padding: 16, borderRadius: 16, border: '2px dashed #E2E8F0',
+                        padding: 20, borderRadius: 20, background: '#18181B',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, cursor: 'pointer',
-                        marginTop: 12, color: '#71717A', fontWeight: 600
+                        marginTop: 16, color: '#fff', fontWeight: 700,
+                        boxShadow: '0 8px 20px rgba(0,0,0,0.1)'
                     }}>
-                    <Plus size={20} />
-                    Yeni Proje Ekle
+                    <Plus size={24} color="#FFD600" /> {/* Sarı ikon */}
+                    <span style={{ fontSize: 16 }}>Yeni Proje Başlat</span>
                 </div>
             </div>
 
