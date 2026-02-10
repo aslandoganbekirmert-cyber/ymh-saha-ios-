@@ -59,37 +59,49 @@ export default function App() {
     /* --- INIT --- */
     useEffect(() => { loadProjects(); }, []);
 
-    // Konum ve Adres Çekme
+    // Fonksiyon: Konumu Manuel veya Otomatik Çek
+    const fetchLocation = async () => {
+        setNewSiteLocation('Konum Alınıyor...');
+        setNewSiteCoords(null);
+        console.log('📍 Konum isteği gönderiliyor...');
+
+        try {
+            // Önce İzin İste (Kullanıcı Tıklamasıyla Tetiklenmeli)
+            // iOS HTTP'de bazen bunu da engeller ama deniyoruz.
+            try { await Geolocation.requestPermissions(); } catch (e) { console.log('İzin istendi:', e); }
+
+            const pos = await Geolocation.getCurrentPosition({ timeout: 15000, enableHighAccuracy: true });
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            setNewSiteCoords({ lat, lng });
+
+            // Adres Çözümleme
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const addr = data.address;
+                    const district = addr.suburb || addr.city_district || addr.town || 'Merkez';
+                    const city = addr.province || addr.city || 'İzmir';
+                    setFetchedAddress({ city, district });
+                    setNewSiteLocation(data.display_name || `${lat}, ${lng}`);
+                } else {
+                    setNewSiteLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                }
+            } catch {
+                setNewSiteLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+            }
+        } catch (err: any) {
+            console.error('Konum Hatası:', err);
+            setNewSiteLocation(`HATA: Konum alınamadı. Lütfen elle girin.`);
+        }
+    };
+
+    // Sayfa açılışında yine de şansımızı deneyelim
     useEffect(() => {
         if (view === 'new-site') {
-            setNewSiteLocation('Adres getiriliyor...');
-            setNewSiteCoords(null);
-
-            Geolocation.getCurrentPosition({ timeout: 10000, enableHighAccuracy: true })
-                .then(async (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    setNewSiteCoords({ lat, lng });
-
-                    try {
-                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-                        if (res.ok) {
-                            const data = await res.json();
-                            const addr = data.address;
-                            const district = addr.suburb || addr.city_district || addr.town || 'Merkez';
-                            const city = addr.province || addr.city || 'İzmir';
-                            setFetchedAddress({ city, district });
-                            setNewSiteLocation(data.display_name || 'Bilinmeyen Adres');
-                        } else {
-                            setNewSiteLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-                        }
-                    } catch (err) {
-                        setNewSiteLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-                    }
-                })
-                .catch((err) => {
-                    setNewSiteLocation('Konum alınamadı (Manuel giriniz)');
-                });
+            // Otomatik deneme (iOS engelleyebilir)
+            fetchLocation();
         }
     }, [view]);
 
@@ -295,11 +307,16 @@ export default function App() {
                                 placeholder="Adres alınıyor..."
                                 style={{ height: 80, resize: 'none', paddingTop: 12 }}
                             />
-                            <div style={{ position: 'absolute', right: 12, top: 12 }}>
+                            <div style={{ position: 'absolute', right: 12, top: 12, cursor: 'pointer' }} onClick={fetchLocation}>
                                 {newSiteLocation === 'Konum Alınıyor...' || newSiteLocation === 'Adres getiriliyor...' ? (
-                                    <Loader2 size={20} className="animate-spin" />
+                                    <Loader2 size={20} className="animate-spin" color="#A1A1AA" />
                                 ) : (
-                                    newSiteLocation.includes('Alınamadı') ? <AlertTriangle size={20} color="#EF4444" /> : <MapPin size={20} color="#10B981" />
+                                    newSiteLocation.includes('HATA') || newSiteLocation.includes('Manuel') ?
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#FEE2E2', padding: '4px 8px', borderRadius: 8 }}>
+                                            <AlertTriangle size={16} color="#EF4444" />
+                                            <span style={{ fontSize: 11, color: '#EF4444', fontWeight: 600 }}>Tekrar Dene</span>
+                                        </div>
+                                        : <MapPin size={20} color="#10B981" />
                                 )}
                             </div>
                         </div>
