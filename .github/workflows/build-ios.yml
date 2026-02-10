@@ -28,7 +28,11 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install Dependencies
-        run: cd mobile && npm install
+        run: |
+          cd mobile
+          # Garanti olsun diye lock dosyasını CI ortamında taze oluşturuyoruz
+          npm install --package-lock-only
+          npm ci || npm install
 
       - name: 🚀 Build iOS IPA
         # profil_imzali profilini kullanarak build alır.
