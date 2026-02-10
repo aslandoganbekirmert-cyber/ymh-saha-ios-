@@ -37,4 +37,4 @@ jobs:
       - name: 🚀 Build iOS IPA
         # profil_imzali profilini kullanarak build alır.
         # Sertifikalarınız Expo sunucularında kayıtlı olmalıdır (ilk sefer lokalden yapmanız önerilir).
-        run: cd mobile && eas build --platform ios --profile profil_imzali --non-interactive --no-wait
+        run: cd mobile && npx eas-cli build --platform ios --profile profil_imzali --non-interactive --no-wait
