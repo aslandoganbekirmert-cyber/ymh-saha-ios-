@@ -357,7 +357,7 @@ export default function App() {
                             <label className="input-label">ARAÇ PLAKASI</label>
                             <input className="modern-input" placeholder="35 ABC 123" value={wbForm.plate} onChange={e => setWbForm({ ...wbForm, plate: e.target.value.toUpperCase() })} />
                         </div>
-                        <div className="stats-container">
+                        <div className="form-row">
                             <div>
                                 <label className="input-label">İRSALİYE NO</label>
                                 <input className="modern-input" placeholder="123456" value={wbForm.invoice_no} onChange={e => setWbForm({ ...wbForm, invoice_no: e.target.value })} />
@@ -379,7 +379,7 @@ export default function App() {
                                 ))}
                             </select>
                         </div>
-                        <div className="stats-container">
+                        <div className="form-row">
                             <div>
                                 <label className="input-label">MİKTAR</label>
                                 <input type="number" className="modern-input" placeholder="0" value={wbForm.qty} onChange={e => setWbForm({ ...wbForm, qty: e.target.value })} />
